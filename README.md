@@ -1,10 +1,10 @@
 <div align="center">
 
 ```
-⬡ OpenChat
+EM DESENVOLVIMENTO
 ```
 
-# OpenChat
+# ⬡ OpenChat
 
 **Interface web local para modelos de linguagem open source via Ollama**
 
