@@ -11,7 +11,7 @@ const state = {
   systemPrompt:     '',
   language:         '',
   thinkingMode:     false,
-  webSearchEnabled: false,   // Web Search RAG
+  webSearchEnabled: false,
   capabilities:     null,
   pendingFiles:     [],
   abortController:  null,
@@ -308,7 +308,6 @@ function setupEventListeners() {
     loadCapabilities(state.model);
   });
 
-  // Web Search toggle
   el.btnWebSearch.addEventListener('click', () => {
     state.webSearchEnabled = !state.webSearchEnabled;
     el.btnWebSearch.classList.toggle('active', state.webSearchEnabled);
@@ -339,7 +338,6 @@ function setupEventListeners() {
   el.btnMemoryAdd.addEventListener('click', addMemory);
   el.memoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') addMemory(); });
 
-  // Projetos
   el.btnNewProject.addEventListener('click', () => openProjectModal('new'));
   el.projectModalClose.addEventListener('click', closeProjectModal);
   el.projectBackdrop.addEventListener('click', e => { if (e.target === el.projectBackdrop) closeProjectModal(); });
@@ -565,10 +563,18 @@ async function loadConversation(id) {
     if (!res.ok) throw new Error();
     const conv = await res.json();
     state.conversationId = id;
-    if (conv.modelName) { el.modelSelect.value = conv.modelName; state.model = conv.modelName; await loadCapabilities(state.model); }
+    if (conv.modelName) {
+      el.modelSelect.value = conv.modelName;
+      state.model = conv.modelName;
+      await loadCapabilities(state.model);
+    }
     el.messagesArea.innerHTML = '';
     showChat();
-    (conv.messages || []).forEach(msg => appendMessage(msg.role, msg.content, false));
+    (conv.messages || []).forEach(msg => {
+      // Usa o campo thinkingEnabled da mensagem para decidir se mostra pensamento
+      const shouldShowThinking = msg.role === 'assistant' && msg.thinkingEnabled === true;
+      appendMessage(msg.role, msg.content, false, [], shouldShowThinking);
+    });
     scrollToBottom();
     document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
     document.querySelector(`.history-item[data-id="${id}"]`)?.classList.add('active');
@@ -606,7 +612,10 @@ function deleteConversation(id, itemEl) { openConfirm(() => performDelete(id, it
 async function performDelete(id, itemEl) {
   try {
     const res = await fetch(`${API.BASE}/api/history/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error();
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Erro ${res.status}: ${text || 'Falha ao deletar'}`);
+    }
     allHistory = allHistory.filter(c => c.id !== id);
     itemEl.remove();
     document.querySelectorAll('.history-section-sep').forEach(sep => {
@@ -615,7 +624,10 @@ async function performDelete(id, itemEl) {
     });
     if (!allHistory.length) el.historyList.appendChild(el.historyEmpty);
     if (state.conversationId === id) newConversation();
-  } catch (err) { console.error('Erro ao deletar:', err); }
+  } catch (err) { 
+    console.error('Erro ao deletar conversa:', err);
+    alert(`Falha ao deletar conversa: ${err.message}`);
+  }
 }
 
 let _confirmCallback = null;
@@ -655,8 +667,11 @@ async function sendMessage() {
   clearAttachPreview();
   showChat();
 
+  // Congela o estado do thinking no momento do envio
+  const thinkingActiveNow = state.thinkingMode;
+
   appendMessage('user', text, false, filesToSend);
-  const assistantEl = appendMessage('assistant', '', true);
+  const assistantEl = appendMessage('assistant', '', true, [], thinkingActiveNow);
   const textEl   = assistantEl.querySelector('.message-text');
   const cursorEl = assistantEl.querySelector('.streaming-cursor');
 
@@ -681,7 +696,7 @@ async function sendMessage() {
     options: state.options, systemPrompt: finalSystemPrompt,
     images, webSearch: state.webSearchEnabled,
     ...(state.activeProjectId && { projectId: state.activeProjectId }),
-    ...(!isNew && { conversationId: state.conversationId }),
+    ...(!isNew && state.conversationId && { conversationId: state.conversationId }),
   };
 
   let fullResponse = '', thinkingText = '';
@@ -709,7 +724,6 @@ async function sendMessage() {
       const flushEvent = (evName, data) => {
         if (evName === 'conversation-id') { state.conversationId = data.trim(); return; }
 
-        // Web search status
         if (evName === 'search-start') {
           searchBanner = document.createElement('div');
           searchBanner.className = 'search-status-banner';
@@ -730,7 +744,8 @@ async function sendMessage() {
 
         if (evName === 'done' || data.trim() === '[DONE]') {
           cursorEl?.remove();
-          renderFinal(textEl, thinkingText, fullResponse);
+          // Usa thinkingActiveNow para decidir se renderiza o bloco de pensamento
+          renderFinal(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
           scrollToBottom(); return;
         }
         if (evName === 'error') {
@@ -738,7 +753,8 @@ async function sendMessage() {
           cursorEl?.remove(); return;
         }
         if (evName === 'thinking') {
-          if (state.thinkingMode) {
+          // Só acumula e renderiza pensamento se thinkingActiveNow era true no envio
+          if (thinkingActiveNow) {
             thinkingText += data;
             renderStreaming(textEl, thinkingText, fullResponse);
             scrollToBottom();
@@ -747,7 +763,8 @@ async function sendMessage() {
         }
         if (evName === 'token' || evName === '') {
           fullResponse += data;
-          renderStreaming(textEl, state.thinkingMode ? thinkingText : '', fullResponse);
+          // Usa thinkingActiveNow, não state.thinkingMode (que pode ter mudado)
+          renderStreaming(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
           scrollToBottom();
         }
       };
@@ -773,14 +790,14 @@ async function sendMessage() {
 
     if (textEl.querySelector('.streaming-cursor')) {
       cursorEl?.remove();
-      renderFinal(textEl, thinkingText, fullResponse);
+      renderFinal(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
     }
   } catch (err) {
     searchBanner?.remove();
     el.btnWebSearch.classList.remove('searching');
     if (err.name === 'AbortError') {
       cursorEl?.remove();
-      if (fullResponse) renderFinal(textEl, thinkingText, fullResponse);
+      if (fullResponse) renderFinal(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
       else textEl.innerHTML = '<em style="color:var(--text-2)">Geração interrompida.</em>';
     } else {
       console.error('Erro SSE:', err);
@@ -808,6 +825,12 @@ function parseStoredMessage(raw) {
   return { thinking: '', content: raw };
 }
 
+// Detecta se o conteúdo salvo possui bloco de pensamento
+function hasThinkingBlock(raw) {
+  if (!raw) return false;
+  return raw.indexOf('<thinking>') === 0 && raw.indexOf('</thinking>') !== -1;
+}
+
 function renderStreaming(textEl, thinking, content) {
   let html = '';
   if (thinking) html += `<details class="thinking-block"><summary>Pensamento</summary><p>${escapeHtml(thinking)}</p></details>`;
@@ -825,15 +848,20 @@ function renderFinal(textEl, thinking, content) {
   textEl.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
 }
 
-function appendMessage(role, rawContent, streaming, files = []) {
+function appendMessage(role, rawContent, streaming, files = [], thinkingWasActive = null) {
   const msg = document.createElement('div');
   msg.className = `message ${role}`;
   const avatarLabel = role === 'user' ? 'Eu' : '⬡';
   const roleLabel   = role === 'user' ? 'Você' : 'Assistente';
 
   const { thinking, content } = parseStoredMessage(rawContent || '');
-  const thinkHtml = thinking
-    ? `<details class="thinking-block"><summary>Pensamento</summary><p>${escapeHtml(thinking)}</p></details>` : '';
+
+  // Só exibe bloco de pensamento se thinkingWasActive === true
+  const shouldShowThinking = thinking && (thinkingWasActive === true);
+  const thinkHtml = shouldShowThinking
+    ? `<details class="thinking-block"><summary>Pensamento</summary><p>${escapeHtml(thinking)}</p></details>`
+    : '';
+
   const rendered = content ? renderMarkdown(content) : '';
 
   const docFiles = files.filter(f => f.type === 'doc');
@@ -964,10 +992,8 @@ async function deleteProject(id, itemEl) {
   });
 }
 
-// Deletar projeto a partir do modal de detalhes
 async function handleDeleteCurrentProject() {
   if (!currentProjectId) return;
-  const name = el.projectModalTitle.textContent;
   openConfirm(async () => {
     try {
       await fetch(`${API.BASE}/api/projects/${currentProjectId}`, { method: 'DELETE' });
@@ -1011,7 +1037,6 @@ async function openProjectModal(mode, projectId) {
       el.projectDetailDesc.textContent = proj.description || 'Sem descrição.';
       el.projectDetailSection.hidden   = false;
       renderProjectFiles(proj.files || []);
-      // Carrega os chats vinculados ao projeto
       await loadProjectChats(projectId);
     } catch { el.projectDetailSection.hidden = false; }
   }

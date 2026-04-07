@@ -101,14 +101,19 @@ public class ConversationService {
 
     @Transactional
     public Message addMessage(UUID conversationId, String role, String content) {
+        return addMessage(conversationId, role, content, false);
+    }
+
+    @Transactional
+    public Message addMessage(UUID conversationId, String role, String content, boolean thinkingEnabled) {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Conversa não encontrada: " + conversationId));
-        Message message = new Message(conversation, role, content);
+        Message message = new Message(conversation, role, content, thinkingEnabled);
         Message saved = messageRepository.save(message);
         conversationRepository.save(conversation);
-        log.debug("Mensagem salva: conversationId={}, role={}, tamanho={}",
-                conversationId, role, content.length());
+        log.debug("Mensagem salva: conversationId={}, role={}, tamanho={}, thinkingEnabled={}",
+                conversationId, role, content.length(), thinkingEnabled);
         return saved;
     }
 

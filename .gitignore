@@ -11,3 +11,6 @@ backend/.mvn/
 
 # Runtime
 *.log
+
+# SearXNG — contém secret key, não versionar
+searxng-config/settings.yml

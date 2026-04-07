@@ -30,6 +30,7 @@ public class ConversationDTO {
         private UUID id;
         private String role;
         private String content;
+        private Boolean thinkingEnabled;
         private LocalDateTime createdAt;
     }
 
@@ -51,6 +52,7 @@ public class ConversationDTO {
                         .id(m.getId())
                         .role(m.getRole())
                         .content(m.getContent())
+                        .thinkingEnabled(m.isThinkingEnabled() ? true : false)
                         .createdAt(m.getCreatedAt())
                         .build())
                 .toList();

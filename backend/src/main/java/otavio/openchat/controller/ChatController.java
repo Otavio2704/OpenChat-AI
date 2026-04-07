@@ -25,7 +25,12 @@ public class ChatController {
 
     @PostMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chat(@RequestBody Map<String, Object> payload) {
-        UUID   conversationId = UUID.fromString((String) payload.get("conversationId"));
+        String convIdStr = (String) payload.get("conversationId");
+        if (convIdStr == null || convIdStr.isBlank()) {
+            throw new IllegalArgumentException("conversationId é obrigatório para continuar uma conversa");
+        }
+        
+        UUID   conversationId = UUID.fromString(convIdStr);
         String userMessage    = (String) payload.get("message");
         String model          = (String) payload.getOrDefault("model", "llama3.2");
 

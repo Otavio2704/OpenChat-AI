@@ -69,3 +69,6 @@ management:
   endpoint:
     health:
       show-details: never
+
+searxng:
+  url: ${SEARXNG_URL:http://localhost:8081}

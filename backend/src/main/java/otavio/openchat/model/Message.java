@@ -39,6 +39,14 @@ public class Message {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    /**
+     * Indica se o thinking mode estava ativado quando esta mensagem (do assistente) foi gerada.
+     * Usado para decidir se renderiza o bloco de pensamento ou não.
+     * Boolean (wrapper class) para permitir migração de mensagens antigas (NULL = false).
+     */
+    @Column(name = "thinking_enabled", nullable = true)
+    private Boolean thinkingEnabled = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -49,6 +57,21 @@ public class Message {
         this.conversation = conversation;
         this.role = role;
         this.content = content;
+        this.thinkingEnabled = false;
+    }
+
+    public Message(Conversation conversation, String role, String content, Boolean thinkingEnabled) {
+        this.conversation = conversation;
+        this.role = role;
+        this.content = content;
+        this.thinkingEnabled = thinkingEnabled != null ? thinkingEnabled : false;
+    }
+
+    /**
+     * Getter customizado que retorna false se thinkingEnabled for null
+     */
+    public boolean isThinkingEnabled() {
+        return thinkingEnabled != null && thinkingEnabled;
     }
 
     /**
