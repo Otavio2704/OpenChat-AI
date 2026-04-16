@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⬡ OpenChat
+# ⬡ Kyron AI
 
 **Chatbot local para modelos de linguagem open source via Ollama**
 
@@ -226,7 +226,7 @@ docker compose up -d --build
 ## 📁 Estrutura do Projeto
 
 ```
-openchat/
+kyron-ai/
 ├── backend/
 │   ├── src/main/java/otavio/openchat/
 │   │   ├── config/       # CORS, WebClient
