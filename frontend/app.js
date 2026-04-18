@@ -1,5 +1,6 @@
 /* ════════════════════════════════════════════════════════════════
    Kyron AI — app.js
+   Inclui: Modo Código, Modo Agente, Diff Visual, Conector GitHub
 ════════════════════════════════════════════════════════════════ */
 const API = { BASE: 'http://localhost:8080' };
 
@@ -12,11 +13,16 @@ const state = {
   language:         '',
   thinkingMode:     false,
   webSearchEnabled: false,
+  codeModeEnabled:  false,
+  agentModeEnabled: false,
   capabilities:     null,
   pendingFiles:     [],
   abortController:  null,
   activeProjectId:  null,
   activeProjectName:'',
+  activeGithubRepo: null,   // { id, fullName }
+  codeSession:      null,   // sessão de código atual
+  pendingActions:   [],     // ações do agente aguardando aprovação
 };
 
 const $ = id => document.getElementById(id);
@@ -24,58 +30,58 @@ let el = {};
 
 function initRefs() {
   el = {
-    sidebar:           $('sidebar'),
-    historyList:       $('history-list'),
-    historyEmpty:      $('history-empty'),
-    searchInput:       $('search-input'),
-    modelSelect:       $('model-select'),
-    modelTags:         $('model-tags'),
-    messagesArea:      $('messages-area'),
-    welcomeScreen:     $('welcome-screen'),
-    messageInput:      $('message-input'),
-    btnSend:           $('btn-send'),
-    iconSend:          $('icon-send'),
-    iconStop:          $('icon-stop'),
-    btnNewChat:        $('btn-new-chat'),
-    btnSettings:       $('btn-settings'),
-    btnTheme:          $('btn-theme'),
-    btnMemory:         $('btn-memory'),
-    btnSidebarCollapse:$('btn-sidebar-collapse'),
-    collapseIcon:      $('collapse-icon'),
-    settingsPanel:     $('settings-panel'),
-    btnModelInfo:      $('btn-model-info'),
-    charCount:         $('char-count'),
-    statusDot:         $('status-dot'),
-    statusText:        $('status-text'),
-    btnToggle:         $('btn-toggle-sidebar'),
-    tempSlider:        $('param-temperature'),
-    tempValue:         $('temperature-value'),
-    ctxSlider:         $('param-ctx'),
-    ctxValue:          $('ctx-value'),
-    systemPrompt:      $('param-system'),
-    languageSelect:    $('param-language'),
-    thinkingChk:       $('param-thinking'),
-    thinkingField:     $('thinking-field'),
-    modalBackdrop:     $('modal-backdrop'),
-    modalTitle:        $('modal-title'),
-    modalBody:         $('modal-body'),
-    modalClose:        $('modal-close'),
-    confirmBackdrop:   $('confirm-backdrop'),
-    confirmDelete:     $('confirm-delete'),
-    confirmCancel:     $('confirm-cancel'),
-    renameBackdrop:    $('rename-backdrop'),
-    renameInput:       $('rename-input'),
-    renameConfirm:     $('rename-confirm'),
-    renameCancel:      $('rename-cancel'),
-    renameClose:       $('rename-close'),
-    memoryBackdrop:    $('memory-backdrop'),
-    memoryModalClose:  $('memory-modal-close'),
-    memoryInput:       $('memory-input'),
-    memoryCategory:    $('memory-category'),
-    btnMemoryAdd:      $('btn-memory-add'),
-    memoryList:        $('memory-list'),
-    accentSwatches:    $('accent-swatches'),
-    customColorInput:  $('custom-color-input'),
+    sidebar:              $('sidebar'),
+    historyList:          $('history-list'),
+    historyEmpty:         $('history-empty'),
+    searchInput:          $('search-input'),
+    modelSelect:          $('model-select'),
+    modelTags:            $('model-tags'),
+    messagesArea:         $('messages-area'),
+    welcomeScreen:        $('welcome-screen'),
+    messageInput:         $('message-input'),
+    btnSend:              $('btn-send'),
+    iconSend:             $('icon-send'),
+    iconStop:             $('icon-stop'),
+    btnNewChat:           $('btn-new-chat'),
+    btnSettings:          $('btn-settings'),
+    btnTheme:             $('btn-theme'),
+    btnMemory:            $('btn-memory'),
+    btnSidebarCollapse:   $('btn-sidebar-collapse'),
+    collapseIcon:         $('collapse-icon'),
+    settingsPanel:        $('settings-panel'),
+    btnModelInfo:         $('btn-model-info'),
+    charCount:            $('char-count'),
+    statusDot:            $('status-dot'),
+    statusText:           $('status-text'),
+    btnToggle:            $('btn-toggle-sidebar'),
+    tempSlider:           $('param-temperature'),
+    tempValue:            $('temperature-value'),
+    ctxSlider:            $('param-ctx'),
+    ctxValue:             $('ctx-value'),
+    systemPrompt:         $('param-system'),
+    languageSelect:       $('param-language'),
+    thinkingChk:          $('param-thinking'),
+    thinkingField:        $('thinking-field'),
+    modalBackdrop:        $('modal-backdrop'),
+    modalTitle:           $('modal-title'),
+    modalBody:            $('modal-body'),
+    modalClose:           $('modal-close'),
+    confirmBackdrop:      $('confirm-backdrop'),
+    confirmDelete:        $('confirm-delete'),
+    confirmCancel:        $('confirm-cancel'),
+    renameBackdrop:       $('rename-backdrop'),
+    renameInput:          $('rename-input'),
+    renameConfirm:        $('rename-confirm'),
+    renameCancel:         $('rename-cancel'),
+    renameClose:          $('rename-close'),
+    memoryBackdrop:       $('memory-backdrop'),
+    memoryModalClose:     $('memory-modal-close'),
+    memoryInput:          $('memory-input'),
+    memoryCategory:       $('memory-category'),
+    btnMemoryAdd:         $('btn-memory-add'),
+    memoryList:           $('memory-list'),
+    accentSwatches:       $('accent-swatches'),
+    customColorInput:     $('custom-color-input'),
     projectsList:         $('projects-list'),
     projectsEmpty:        $('projects-empty'),
     btnNewProject:        $('btn-new-project'),
@@ -108,8 +114,35 @@ function initRefs() {
     btnClearProject:      $('btn-clear-project'),
     btnAttach:            $('btn-attach'),
     btnWebSearch:         $('btn-web-search'),
+    btnCodeMode:          $('btn-code-mode'),
+    btnAgentMode:         $('btn-agent-mode'),
+    btnGithub:            $('btn-github'),
     fileInput:            $('file-input'),
     attachPreview:        $('attach-preview'),
+    // Painel do Modo Código
+    codePanel:            $('code-panel'),
+    codePanelClose:       $('code-panel-close'),
+    codePanelDownloadZip: $('code-panel-download-zip'),
+    codeFileTree:         $('code-file-tree'),
+    codeEditorContent:    $('code-editor-content'),
+    codeEditorFilename:   $('code-editor-filename'),
+    codePanelDownloadFile:$('code-panel-download-file'),
+    codeDiffToggle:       $('code-diff-toggle'),
+    // Painel de ações do agente
+    agentActionsPanel:    $('agent-actions-panel'),
+    agentActionsList:     $('agent-actions-list'),
+    // Modal GitHub
+    githubBackdrop:       $('github-backdrop'),
+    githubModalClose:     $('github-modal-close'),
+    githubRepoInput:      $('github-repo-input'),
+    githubBranchInput:    $('github-branch-input'),
+    githubTokenInput:     $('github-token-input'),
+    githubPrivateChk:     $('github-private-chk'),
+    btnGithubConnect:     $('btn-github-connect'),
+    githubRepoList:       $('github-repo-list'),
+    githubContextBadge:   $('github-context-badge'),
+    githubContextName:    $('github-context-name'),
+    btnClearGithub:       $('btn-clear-github'),
   };
 }
 
@@ -129,11 +162,21 @@ function configureMarked() {
   const renderer = new marked.Renderer();
   renderer.code = (code, lang) => {
     const codeText = typeof code === 'object' ? code.text : code;
-    let language = lang && hljs.getLanguage(lang) ? lang : null;
+    // Remove o caminho do arquivo da linguagem exibida (ex: "java:src/App.java" → "java")
+    const rawLang = typeof lang === 'string' ? lang : '';
+    const langOnly = rawLang.includes(':') ? rawLang.split(':')[0] : rawLang;
+    const filePath = rawLang.includes(':') ? rawLang.split(':').slice(1).join(':') : null;
+
+    let language = langOnly && hljs.getLanguage(langOnly) ? langOnly : null;
     const result = language ? hljs.highlight(codeText, { language }) : hljs.highlightAuto(codeText);
     language = language || result.language || 'plaintext';
     const ll = language.toLowerCase();
-    return `<pre><div class="code-header"><span class="code-lang">${ll}</span><button class="btn-copy-code" onclick="copyCode(this)">Copiar</button></div><code class="hljs language-${ll}">${result.value}</code></pre>`;
+
+    const filePathHtml = filePath
+      ? `<span class="code-filepath" title="${escapeHtml(filePath)}">${escapeHtml(filePath)}</span>`
+      : '';
+
+    return `<pre><div class="code-header">${filePathHtml}<span class="code-lang">${ll}</span><button class="btn-copy-code" onclick="copyCode(this)">Copiar</button></div><code class="hljs language-${ll}">${result.value}</code></pre>`;
   };
   marked.use({ renderer, breaks: true, gfm: true });
 }
@@ -308,15 +351,54 @@ function setupEventListeners() {
     loadCapabilities(state.model);
   });
 
+  // Botão Web Search
   el.btnWebSearch.addEventListener('click', () => {
     state.webSearchEnabled = !state.webSearchEnabled;
     el.btnWebSearch.classList.toggle('active', state.webSearchEnabled);
     el.btnWebSearch.setAttribute('aria-pressed', state.webSearchEnabled);
-    el.btnWebSearch.title = state.webSearchEnabled
-      ? 'Busca web ativa — clique para desativar'
-      : 'Ativar busca web (RAG)';
+    el.btnWebSearch.title = state.webSearchEnabled ? 'Busca web ativa — clique para desativar' : 'Ativar busca web (RAG)';
   });
 
+  // Botão Modo Código
+  el.btnCodeMode.addEventListener('click', () => {
+    state.codeModeEnabled = !state.codeModeEnabled;
+    if (state.codeModeEnabled && state.agentModeEnabled) {
+      // Mutuamente exclusivos — desativa agente ao ativar código
+      state.agentModeEnabled = false;
+      el.btnAgentMode.classList.remove('active');
+    }
+    el.btnCodeMode.classList.toggle('active', state.codeModeEnabled);
+    el.btnCodeMode.title = state.codeModeEnabled ? 'Modo Código ativo' : 'Ativar Modo Código';
+    if (state.codeModeEnabled && state.conversationId) loadCodeSession();
+  });
+
+  // Botão Modo Agente
+  el.btnAgentMode.addEventListener('click', () => {
+    state.agentModeEnabled = !state.agentModeEnabled;
+    if (state.agentModeEnabled && state.codeModeEnabled) {
+      state.codeModeEnabled = false;
+      el.btnCodeMode.classList.remove('active');
+    }
+    el.btnAgentMode.classList.toggle('active', state.agentModeEnabled);
+    el.btnAgentMode.title = state.agentModeEnabled ? 'Modo Agente ativo' : 'Ativar Modo Agente';
+  });
+
+  // Botão GitHub
+  el.btnGithub.addEventListener('click', openGithubModal);
+
+  // Painel de código
+  el.codePanelClose.addEventListener('click', closeCodePanel);
+  el.codePanelDownloadZip.addEventListener('click', downloadProjectZip);
+  el.codePanelDownloadFile.addEventListener('click', downloadCurrentFile);
+  el.codeDiffToggle.addEventListener('click', toggleDiffView);
+
+  // Modal GitHub
+  el.githubModalClose.addEventListener('click', closeGithubModal);
+  el.githubBackdrop.addEventListener('click', e => { if (e.target === el.githubBackdrop) closeGithubModal(); });
+  el.btnGithubConnect.addEventListener('click', connectGithubRepo);
+  el.btnClearGithub.addEventListener('click', clearGithubContext);
+
+  // Outros
   el.btnAttach.addEventListener('click', () => el.fileInput.click());
   el.fileInput.addEventListener('change', handleFileSelect);
 
@@ -375,6 +457,468 @@ function setStreamingUI(streaming) {
   el.iconStop.style.display = streaming ? '' : 'none';
   el.btnSend.classList.toggle('stopping', streaming);
 }
+
+/* ════════════════════════════════════════════════════════════════
+   MODO CÓDIGO — Painel de arquivos
+════════════════════════════════════════════════════════════════ */
+let currentFileId   = null;
+let showingDiff     = false;
+
+async function loadCodeSession() {
+  if (!state.conversationId) return;
+  try {
+    const res = await fetch(`${API.BASE}/api/code/session/${state.conversationId}`);
+    if (!res.ok) return;
+    state.codeSession = await res.json();
+    if (state.codeSession && state.codeSession.files?.length > 0) {
+      renderCodePanel();
+    }
+  } catch (err) {
+    console.error('Erro ao carregar sessão de código:', err);
+  }
+}
+
+function renderCodePanel() {
+  if (!state.codeSession) return;
+  el.codePanel.classList.add('open');
+  document.body.classList.add('code-panel-open');
+  renderFileTree();
+  // Abre o primeiro arquivo automaticamente
+  if (state.codeSession.files?.length > 0) {
+    openFileInEditor(state.codeSession.files[0]);
+  }
+}
+
+function closeCodePanel() {
+  el.codePanel.classList.remove('open');
+  document.body.classList.remove('code-panel-open');
+}
+
+function renderFileTree() {
+  const files = state.codeSession?.files || [];
+  // Agrupa por diretório
+  const tree = {};
+  files.forEach(f => {
+    const parts = f.filePath.split('/');
+    let node = tree;
+    for (let i = 0; i < parts.length - 1; i++) {
+      node[parts[i]] = node[parts[i]] || { _dir: true, _children: {} };
+      node = node[parts[i]]._children;
+    }
+    node[parts[parts.length - 1]] = { _file: f };
+  });
+
+  el.codeFileTree.innerHTML = renderTreeNode(tree, 0);
+}
+
+function renderTreeNode(node, depth) {
+  let html = '';
+  const indent = depth * 14;
+
+  // Diretórios primeiro
+  Object.entries(node)
+    .filter(([, v]) => v._dir)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([name, val]) => {
+      html += `
+        <div class="tree-dir" style="padding-left:${indent}px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/>
+          </svg>
+          ${escapeHtml(name)}
+        </div>
+        ${renderTreeNode(val._children, depth + 1)}
+      `;
+    });
+
+  // Arquivos
+  Object.entries(node)
+    .filter(([, v]) => v._file)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([name, val]) => {
+      const f   = val._file;
+      const ext = f.extension || '';
+      const badge = f.newFile
+        ? '<span class="tree-badge new">N</span>'
+        : `<span class="tree-badge updated">v${f.version}</span>`;
+      const active = f.id === currentFileId ? ' active' : '';
+      html += `
+        <div class="tree-file${active}" style="padding-left:${indent + 8}px"
+             data-file-id="${f.id}" onclick="openFileById('${f.id}')">
+          <span class="tree-file-icon">${getFileIcon(ext)}</span>
+          <span class="tree-file-name" title="${escapeHtml(f.filePath)}">${escapeHtml(name)}</span>
+          ${badge}
+        </div>
+      `;
+    });
+
+  return html;
+}
+
+function getFileIcon(ext) {
+  const icons = {
+    java: '☕', py: '🐍', js: '🟨', ts: '🔷', tsx: '⚛', jsx: '⚛',
+    html: '🌐', css: '🎨', scss: '🎨', json: '📋', xml: '📋',
+    yml: '⚙', yaml: '⚙', md: '📝', sql: '🗃', sh: '⬛',
+    go: '🐹', rs: '🦀', kt: '🎯', swift: '🧡', cs: '💜',
+    php: '🐘', rb: '💎', dart: '🎯', cpp: '⚙', c: '⚙',
+  };
+  return icons[ext] || '📄';
+}
+
+window.openFileById = function(fileId) {
+  const file = state.codeSession?.files?.find(f => f.id === fileId);
+  if (file) openFileInEditor(file);
+};
+
+function openFileInEditor(file) {
+  currentFileId = file.id;
+  showingDiff   = false;
+  el.codeEditorFilename.textContent = file.filePath;
+  el.codeDiffToggle.style.display   = file.previousContent ? '' : 'none';
+  el.codeDiffToggle.textContent     = 'Ver Diff';
+  renderEditorContent(file.content, file.extension);
+  // Marca arquivo ativo na árvore
+  document.querySelectorAll('.tree-file').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.tree-file[data-file-id="${file.id}"]`)?.classList.add('active');
+}
+
+function renderEditorContent(content, ext) {
+  const language = ext && hljs.getLanguage(ext) ? ext : null;
+  const result   = language
+    ? hljs.highlight(content, { language })
+    : hljs.highlightAuto(content);
+  el.codeEditorContent.innerHTML = `<code class="hljs">${result.value}</code>`;
+}
+
+function toggleDiffView() {
+  const file = state.codeSession?.files?.find(f => f.id === currentFileId);
+  if (!file || !file.previousContent) return;
+
+  showingDiff = !showingDiff;
+  el.codeDiffToggle.textContent = showingDiff ? 'Ver Arquivo' : 'Ver Diff';
+
+  if (showingDiff) {
+    renderDiffView(file.previousContent, file.content);
+  } else {
+    renderEditorContent(file.content, file.extension);
+  }
+}
+
+function renderDiffView(oldContent, newContent) {
+  const oldLines = oldContent.split('\n');
+  const newLines = newContent.split('\n');
+
+  // Diff simples linha a linha
+  const maxLen = Math.max(oldLines.length, newLines.length);
+  let html = '<div class="diff-view">';
+
+  const addedSet   = new Set();
+  const removedSet = new Set();
+
+  // Detecta linhas adicionadas/removidas por conteúdo
+  const oldSet = new Set(oldLines);
+  const newSet = new Set(newLines);
+
+  newLines.forEach((line, i) => {
+    if (!oldSet.has(line)) addedSet.add(i);
+  });
+  oldLines.forEach((line, i) => {
+    if (!newSet.has(line)) removedSet.add(i);
+  });
+
+  // Renderiza lado a lado (diff unificado simplificado)
+  let lineNum = 1;
+  for (let i = 0; i < newLines.length; i++) {
+    const line     = newLines[i];
+    const isAdded  = addedSet.has(i);
+    const cls      = isAdded ? 'diff-added' : '';
+    html += `<div class="diff-line ${cls}">
+      <span class="diff-line-num">${lineNum++}</span>
+      <span class="diff-prefix">${isAdded ? '+' : ' '}</span>
+      <span class="diff-content">${escapeHtml(line)}</span>
+    </div>`;
+  }
+
+  html += '</div>';
+  el.codeEditorContent.innerHTML = html;
+}
+
+async function downloadCurrentFile() {
+  if (!currentFileId || !state.conversationId) return;
+  try {
+    const res = await fetch(`${API.BASE}/api/code/session/${state.conversationId}/download/file/${currentFileId}`);
+    if (!res.ok) return;
+    const blob     = await res.blob();
+    const filename = el.codeEditorFilename.textContent.split('/').pop();
+    triggerDownload(blob, filename);
+  } catch (err) {
+    console.error('Erro ao baixar arquivo:', err);
+  }
+}
+
+async function downloadProjectZip() {
+  if (!state.conversationId) return;
+  try {
+    const res = await fetch(`${API.BASE}/api/code/session/${state.conversationId}/download/zip`);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    triggerDownload(blob, `kyronai-${state.conversationId.slice(0, 8)}.zip`);
+  } catch (err) {
+    console.error('Erro ao baixar ZIP:', err);
+  }
+}
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MODO AGENTE — Cards de aprovação
+════════════════════════════════════════════════════════════════ */
+function renderAgentActions(actions) {
+  state.pendingActions = actions.filter(a => a.status === 'PENDING');
+  if (state.pendingActions.length === 0) {
+    el.agentActionsPanel.hidden = true;
+    return;
+  }
+
+  el.agentActionsPanel.hidden = false;
+  el.agentActionsList.innerHTML = state.pendingActions.map(action => `
+    <div class="agent-action-card" data-action-id="${action.id}">
+      <div class="agent-action-header">
+        <span class="agent-action-type agent-action-type-${action.actionType.toLowerCase()}">
+          ${getActionTypeIcon(action.actionType)} ${action.actionType.replace('_', ' ')}
+        </span>
+        ${action.filePath ? `<span class="agent-action-path">${escapeHtml(action.filePath)}</span>` : ''}
+      </div>
+      <div class="agent-action-desc">${escapeHtml(action.description || '')}</div>
+      ${action.proposedContent ? `
+        <details class="agent-action-preview">
+          <summary>Ver conteúdo proposto</summary>
+          <pre class="agent-action-code"><code>${escapeHtml(action.proposedContent.slice(0, 500))}${action.proposedContent.length > 500 ? '\n...' : ''}</code></pre>
+        </details>
+      ` : ''}
+      <div class="agent-action-btns">
+        <button class="btn-agent-reject" onclick="rejectAgentAction('${action.id}')">
+          ✕ Rejeitar
+        </button>
+        <button class="btn-agent-approve" onclick="approveAgentAction('${action.id}')">
+          ✓ Aprovar
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getActionTypeIcon(type) {
+  const icons = {
+    CREATE_FILE: '📄', EDIT_FILE: '✏️', DELETE_FILE: '🗑️',
+    RUN_COMMAND: '⚡', EXPLAIN: '💡'
+  };
+  return icons[type] || '⚙️';
+}
+
+window.approveAgentAction = async function(actionId) {
+  const card = document.querySelector(`.agent-action-card[data-action-id="${actionId}"]`);
+  if (card) { card.classList.add('processing'); }
+
+  try {
+    const res = await fetch(`${API.BASE}/api/agent/actions/${actionId}/approve`, { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const action = await res.json();
+
+    if (card) {
+      card.classList.remove('processing');
+      card.classList.add('approved');
+      card.querySelector('.agent-action-btns').innerHTML = '<span class="agent-status-badge approved">✓ Executado</span>';
+      setTimeout(() => card.remove(), 1500);
+    }
+
+    // Atualiza a sessão de código se a ação gerou arquivos
+    if (['CREATE_FILE', 'EDIT_FILE'].includes(action.actionType)) {
+      await loadCodeSession();
+      if (state.codeSession?.files?.length > 0) renderCodePanel();
+    }
+
+    // Remove da lista de pendentes
+    state.pendingActions = state.pendingActions.filter(a => a.id !== actionId);
+    if (state.pendingActions.length === 0) {
+      setTimeout(() => { el.agentActionsPanel.hidden = true; }, 1600);
+    }
+  } catch (err) {
+    console.error('Erro ao aprovar ação:', err);
+    if (card) card.classList.remove('processing');
+  }
+};
+
+window.rejectAgentAction = async function(actionId) {
+  const card = document.querySelector(`.agent-action-card[data-action-id="${actionId}"]`);
+  try {
+    await fetch(`${API.BASE}/api/agent/actions/${actionId}/reject`, { method: 'POST' });
+    if (card) {
+      card.classList.add('rejected');
+      card.querySelector('.agent-action-btns').innerHTML = '<span class="agent-status-badge rejected">✕ Rejeitado</span>';
+      setTimeout(() => card.remove(), 1200);
+    }
+    state.pendingActions = state.pendingActions.filter(a => a.id !== actionId);
+    if (state.pendingActions.length === 0) {
+      setTimeout(() => { el.agentActionsPanel.hidden = true; }, 1300);
+    }
+  } catch (err) {
+    console.error('Erro ao rejeitar ação:', err);
+  }
+};
+
+/* ════════════════════════════════════════════════════════════════
+   GITHUB CONNECTOR
+════════════════════════════════════════════════════════════════ */
+let githubRepos = [];
+
+async function openGithubModal() {
+  el.githubBackdrop.hidden = false;
+  await loadGithubRepos();
+}
+
+function closeGithubModal() {
+  el.githubBackdrop.hidden = true;
+}
+
+async function loadGithubRepos() {
+  el.githubRepoList.innerHTML = '<div class="spinner"></div>';
+  try {
+    const res = await fetch(`${API.BASE}/api/github/repositories`);
+    if (!res.ok) throw new Error();
+    githubRepos = await res.json();
+    renderGithubRepos();
+  } catch {
+    el.githubRepoList.innerHTML = '<p style="color:var(--text-2);font-size:12px;text-align:center;padding:12px">Erro ao carregar repositórios.</p>';
+  }
+}
+
+function renderGithubRepos() {
+  if (!githubRepos.length) {
+    el.githubRepoList.innerHTML = '<p style="color:var(--text-2);font-size:12px;text-align:center;padding:12px">Nenhum repositório conectado.</p>';
+    return;
+  }
+
+  el.githubRepoList.innerHTML = githubRepos.map(repo => {
+    const statusBadge = {
+      READY:    '<span class="repo-status ready">● Pronto</span>',
+      INDEXING: '<span class="repo-status indexing">◌ Indexando...</span>',
+      PENDING:  '<span class="repo-status pending">◌ Pendente</span>',
+      ERROR:    '<span class="repo-status error">✕ Erro</span>',
+    }[repo.indexStatus] || '';
+
+    const isActive = state.activeGithubRepo?.id === repo.id;
+
+    return `
+      <div class="github-repo-item ${isActive ? 'active' : ''}" data-repo-id="${repo.id}">
+        <div class="github-repo-info">
+          <div class="github-repo-name">${escapeHtml(repo.fullName)}</div>
+          <div class="github-repo-meta">
+            <span>🌿 ${escapeHtml(repo.branch)}</span>
+            <span>${repo.indexedFilesCount} arquivos</span>
+            ${statusBadge}
+          </div>
+        </div>
+        <div class="github-repo-actions">
+          ${repo.indexStatus === 'READY' ? `
+            <button class="btn-repo-use ${isActive ? 'active' : ''}"
+                    onclick="toggleGithubRepo('${repo.id}', '${escapeHtml(repo.fullName)}')">
+              ${isActive ? 'Desativar' : 'Usar'}
+            </button>
+          ` : ''}
+          <button class="btn-repo-reindex" onclick="reindexRepo('${repo.id}')" title="Re-indexar">↺</button>
+          <button class="btn-repo-delete" onclick="deleteRepo('${repo.id}')" title="Remover">✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function connectGithubRepo() {
+  const fullName    = el.githubRepoInput.value.trim();
+  const branch      = el.githubBranchInput.value.trim() || 'main';
+  const accessToken = el.githubTokenInput.value.trim();
+  const isPrivate   = el.githubPrivateChk.checked;
+
+  if (!fullName) { el.githubRepoInput.focus(); return; }
+
+  el.btnGithubConnect.disabled     = true;
+  el.btnGithubConnect.textContent  = 'Conectando...';
+
+  try {
+    const res = await fetch(`${API.BASE}/api/github/repositories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName, branch, accessToken, isPrivate }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    el.githubRepoInput.value    = '';
+    el.githubBranchInput.value  = '';
+    el.githubTokenInput.value   = '';
+    el.githubPrivateChk.checked = false;
+    await loadGithubRepos();
+  } catch (err) {
+    alert(`Erro ao conectar repositório: ${err.message}`);
+  } finally {
+    el.btnGithubConnect.disabled    = false;
+    el.btnGithubConnect.textContent = 'Conectar';
+  }
+}
+
+window.toggleGithubRepo = function(repoId, fullName) {
+  if (state.activeGithubRepo?.id === repoId) {
+    clearGithubContext();
+  } else {
+    setGithubContext(repoId, fullName);
+    closeGithubModal();
+  }
+  renderGithubRepos();
+};
+
+function setGithubContext(id, fullName) {
+  state.activeGithubRepo        = { id, fullName };
+  el.githubContextBadge.hidden  = false;
+  el.githubContextName.textContent = `GitHub: ${fullName}`;
+  el.btnGithub.classList.add('active');
+}
+
+function clearGithubContext() {
+  state.activeGithubRepo        = null;
+  el.githubContextBadge.hidden  = true;
+  el.btnGithub.classList.remove('active');
+}
+
+window.reindexRepo = async function(repoId) {
+  try {
+    await fetch(`${API.BASE}/api/github/repositories/${repoId}/reindex`, { method: 'POST' });
+    await loadGithubRepos();
+  } catch (err) {
+    console.error('Erro ao re-indexar:', err);
+  }
+};
+
+window.deleteRepo = async function(repoId) {
+  openConfirm(async () => {
+    try {
+      await fetch(`${API.BASE}/api/github/repositories/${repoId}`, { method: 'DELETE' });
+      if (state.activeGithubRepo?.id === repoId) clearGithubContext();
+      await loadGithubRepos();
+    } catch (err) {
+      console.error('Erro ao deletar repo:', err);
+    }
+  });
+};
 
 /* ════════════════════════════════════════════════════════════════
    ANEXOS
@@ -534,10 +1078,8 @@ function buildHistoryItem(conv) {
 function renderHistory(items) {
   el.historyList.innerHTML = '';
   if (!items.length) { el.historyList.appendChild(el.historyEmpty); return; }
-
   const pinned  = items.filter(c => c.pinned);
   const recents = items.filter(c => !c.pinned);
-
   if (pinned.length) {
     const sep = document.createElement('div');
     sep.className = 'history-section-sep'; sep.textContent = 'Fixados';
@@ -557,15 +1099,6 @@ function filterHistory() {
   renderHistory(term ? allHistory.filter(c => c.title.toLowerCase().includes(term)) : allHistory);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   MUDANÇA 1 — Nova função auxiliar parseDocAttachments
-   Detecta blocos [Conteúdo de "arquivo"]:\n... salvos no banco
-   e os separa do texto limpo, retornando cards para reconstrução visual.
-════════════════════════════════════════════════════════════════ */
-/**
- * Extrai blocos [Conteúdo de "arquivo"]:\n... do texto salvo,
- * retornando { cards: [{name}], cleanText } para reconstruir o visual.
- */
 function parseDocAttachments(text) {
   if (!text) return { cards: [], cleanText: text || '' };
   const cards = [];
@@ -577,11 +1110,6 @@ function parseDocAttachments(text) {
   return { cards, cleanText };
 }
 
-/* ════════════════════════════════════════════════════════════════
-   MUDANÇA 2 — loadConversation atualizada
-   - Filtra mensagens role:"tool" (web search context)
-   - Exibe badge discreto com contagem de buscas realizadas
-════════════════════════════════════════════════════════════════ */
 async function loadConversation(id) {
   try {
     const res = await fetch(`${API.BASE}/api/history/${id}`);
@@ -596,12 +1124,10 @@ async function loadConversation(id) {
     el.messagesArea.innerHTML = '';
     showChat();
 
-    // Conta quantas buscas web foram feitas nesta conversa
     const webSearchCount = (conv.messages || [])
       .filter(m => m.role === 'tool' && m.content?.startsWith('[WEB_SEARCH_CONTEXT]'))
       .length;
 
-    // Exibe badge discreto se houve buscas, antes das mensagens
     if (webSearchCount > 0) {
       const badge = document.createElement('div');
       badge.className = 'web-search-history-badge';
@@ -614,7 +1140,6 @@ async function loadConversation(id) {
       el.messagesArea.appendChild(badge);
     }
 
-    // Renderiza apenas mensagens user/assistant — ignora role:tool
     (conv.messages || [])
       .filter(m => m.role === 'user' || m.role === 'assistant')
       .forEach(msg => {
@@ -625,6 +1150,18 @@ async function loadConversation(id) {
     scrollToBottom();
     document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
     document.querySelector(`.history-item[data-id="${id}"]`)?.classList.add('active');
+
+    // Carrega sessão de código se modo código ativo
+    if (state.codeModeEnabled) await loadCodeSession();
+
+    // Carrega ações pendentes se modo agente ativo
+    if (state.agentModeEnabled) {
+      const actRes = await fetch(`${API.BASE}/api/agent/actions/${id}`);
+      if (actRes.ok) {
+        const actions = await actRes.json();
+        renderAgentActions(actions);
+      }
+    }
   } catch (err) { console.error('Erro ao carregar conversa:', err); }
 }
 
@@ -654,15 +1191,11 @@ function openRename(id, currentTitle, itemEl) {
 }
 function closeRename() { el.renameBackdrop.hidden = true; _renameTarget = null; }
 
-/* ── Delete conversa ─── */
 function deleteConversation(id, itemEl) { openConfirm(() => performDelete(id, itemEl)); }
 async function performDelete(id, itemEl) {
   try {
     const res = await fetch(`${API.BASE}/api/history/${id}`, { method: 'DELETE' });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Erro ${res.status}: ${text || 'Falha ao deletar'}`);
-    }
+    if (!res.ok) throw new Error(`Erro ${res.status}`);
     allHistory = allHistory.filter(c => c.id !== id);
     itemEl.remove();
     document.querySelectorAll('.history-section-sep').forEach(sep => {
@@ -671,7 +1204,7 @@ async function performDelete(id, itemEl) {
     });
     if (!allHistory.length) el.historyList.appendChild(el.historyEmpty);
     if (state.conversationId === id) newConversation();
-  } catch (err) { 
+  } catch (err) {
     console.error('Erro ao deletar conversa:', err);
     alert(`Falha ao deletar conversa: ${err.message}`);
   }
@@ -690,17 +1223,21 @@ function closeConfirm() { el.confirmBackdrop.hidden = true; _confirmCallback = n
 ════════════════════════════════════════════════════════════════ */
 function newConversation() {
   state.conversationId = null;
+  state.codeSession    = null;
+  state.pendingActions = [];
   el.messagesArea.innerHTML = '';
   el.messageInput.value = '';
   updateCharCount();
   clearAttachPreview();
   showWelcome();
+  closeCodePanel();
+  el.agentActionsPanel.hidden = true;
   document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
   if (window.innerWidth <= 768) el.sidebar.classList.remove('open');
 }
 
 /* ════════════════════════════════════════════════════════════════
-   ENVIO + STREAMING
+   ENVIO + STREAMING — agora passa codeMode, agentMode, githubRepoId
 ════════════════════════════════════════════════════════════════ */
 async function sendMessage() {
   const text = el.messageInput.value.trim();
@@ -714,7 +1251,6 @@ async function sendMessage() {
   clearAttachPreview();
   showChat();
 
-  // Congela o estado do thinking no momento do envio
   const thinkingActiveNow = state.thinkingMode;
 
   appendMessage('user', text, false, filesToSend);
@@ -741,7 +1277,11 @@ async function sendMessage() {
   const body = {
     message: fullText, model: state.model,
     options: state.options, systemPrompt: finalSystemPrompt,
-    images, webSearch: state.webSearchEnabled,
+    images,
+    webSearch:    state.webSearchEnabled,
+    codeMode:     state.codeModeEnabled,
+    agentMode:    state.agentModeEnabled,
+    githubRepoId: state.activeGithubRepo?.id ?? null,
     ...(state.activeProjectId && { projectId: state.activeProjectId }),
     ...(!isNew && state.conversationId && { conversationId: state.conversationId }),
   };
@@ -780,18 +1320,33 @@ async function sendMessage() {
           return;
         }
         if (evName === 'search-done') {
-          if (searchBanner) {
-            searchBanner.classList.add('done');
-            setTimeout(() => searchBanner?.remove(), 600);
-            searchBanner = null;
-          }
+          if (searchBanner) { searchBanner.classList.add('done'); setTimeout(() => searchBanner?.remove(), 600); searchBanner = null; }
           el.btnWebSearch.classList.remove('searching');
           return;
         }
 
+        // Evento: arquivos de código gerados
+        if (evName === 'code-files' && data.trim()) {
+          handleCodeFilesEvent(data.trim());
+          return;
+        }
+
+        // Evento: ações do agente
+        if (evName === 'agent-actions' && data.trim()) {
+          try {
+            const actions = JSON.parse(data.trim());
+            renderAgentActions(actions);
+          } catch (e) {
+            console.error('Erro ao parsear ações do agente:', e);
+          }
+          return;
+        }
+
+        // Evento: contexto GitHub injetado
+        if (evName === 'github-context') { return; }
+
         if (evName === 'done' || data.trim() === '[DONE]') {
           cursorEl?.remove();
-          // Usa thinkingActiveNow para decidir se renderiza o bloco de pensamento
           renderFinal(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
           scrollToBottom(); return;
         }
@@ -800,7 +1355,6 @@ async function sendMessage() {
           cursorEl?.remove(); return;
         }
         if (evName === 'thinking') {
-          // Só acumula e renderiza pensamento se thinkingActiveNow era true no envio
           if (thinkingActiveNow) {
             thinkingText += data;
             renderStreaming(textEl, thinkingText, fullResponse);
@@ -810,7 +1364,6 @@ async function sendMessage() {
         }
         if (evName === 'token' || evName === '') {
           fullResponse += data;
-          // Usa thinkingActiveNow, não state.thinkingMode (que pode ter mudado)
           renderStreaming(textEl, thinkingActiveNow ? thinkingText : '', fullResponse);
           scrollToBottom();
         }
@@ -859,6 +1412,48 @@ async function sendMessage() {
   }
 }
 
+async function handleCodeFilesEvent(data) {
+  // data = "path|id|new/updated|version;path2|id2|..."
+  const files = data.split(';').map(s => {
+    const [path, id, status, version] = s.split('|');
+    return { path, id, status, version: parseInt(version) };
+  });
+
+  // Atualiza/cria badge de arquivos no chat
+  showCodeFilesBadge(files);
+
+  // Atualiza sessão e abre painel
+  await loadCodeSession();
+  if (state.codeSession?.files?.length > 0) {
+    renderCodePanel();
+  }
+}
+
+function showCodeFilesBadge(files) {
+  // Remove badge anterior se existir
+  document.querySelector('.code-files-banner')?.remove();
+
+  const banner = document.createElement('div');
+  banner.className = 'code-files-banner';
+  const newCount     = files.filter(f => f.status === 'new').length;
+  const updatedCount = files.filter(f => f.status === 'updated').length;
+
+  let text = '📁 ';
+  if (newCount > 0)     text += `${newCount} arquivo${newCount > 1 ? 's' : ''} criado${newCount > 1 ? 's' : ''}`;
+  if (updatedCount > 0) text += `${newCount > 0 ? ', ' : ''}${updatedCount} atualizado${updatedCount > 1 ? 's' : ''}`;
+
+  banner.innerHTML = `
+    ${text}
+    <button class="code-banner-btn" onclick="openCodePanelFromBanner()">Ver Arquivos →</button>
+  `;
+  el.messagesArea.appendChild(banner);
+  scrollToBottom();
+}
+
+window.openCodePanelFromBanner = function() {
+  if (state.codeSession) renderCodePanel();
+};
+
 /* ════════════════════════════════════════════════════════════════
    RENDERIZAÇÃO
 ════════════════════════════════════════════════════════════════ */
@@ -870,12 +1465,6 @@ function parseStoredMessage(raw) {
     return { thinking: raw.slice(openTag.length, end), content: raw.slice(end + closeTag.length) };
   }
   return { thinking: '', content: raw };
-}
-
-// Detecta se o conteúdo salvo possui bloco de pensamento
-function hasThinkingBlock(raw) {
-  if (!raw) return false;
-  return raw.indexOf('<thinking>') === 0 && raw.indexOf('</thinking>') !== -1;
 }
 
 function renderStreaming(textEl, thinking, content) {
@@ -895,11 +1484,6 @@ function renderFinal(textEl, thinking, content) {
   textEl.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
 }
 
-/* ════════════════════════════════════════════════════════════════
-   MUDANÇA 3 — appendMessage atualizada
-   Reconstrói cards visuais de arquivo a partir do texto salvo no banco,
-   em vez de exibir o conteúdo extraído bruto no histórico.
-════════════════════════════════════════════════════════════════ */
 function appendMessage(role, rawContent, streaming, files = [], thinkingWasActive = null) {
   const msg = document.createElement('div');
   msg.className = `message ${role}`;
@@ -908,8 +1492,6 @@ function appendMessage(role, rawContent, streaming, files = [], thinkingWasActiv
 
   const { thinking, content: parsedContent } = parseStoredMessage(rawContent || '');
 
-  // Para mensagens do usuário carregadas do histórico, reconstrói cards de arquivo
-  // em vez de exibir o texto extraído bruto.
   let displayContent = parsedContent;
   let restoredCards  = [];
   if (role === 'user' && !streaming && files.length === 0) {
@@ -925,11 +1507,9 @@ function appendMessage(role, rawContent, streaming, files = [], thinkingWasActiv
 
   const rendered = displayContent ? renderMarkdown(displayContent) : '';
 
-  // Arquivos passados diretamente (envio ao vivo)
   const docFiles = files.filter(f => f.type === 'doc');
   const imgFiles = files.filter(f => f.type === 'image');
 
-  // Cards reconstruídos do histórico
   const restoredHtml = restoredCards.map(f =>
     `<div class="message-attach-card">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1088,7 +1668,6 @@ async function handleDeleteCurrentProject() {
   });
 }
 
-/* ── Modal de Projeto ─── */
 async function openProjectModal(mode, projectId) {
   currentProjectId = projectId || null;
   el.projectFormSection.hidden   = true;
@@ -1101,7 +1680,6 @@ async function openProjectModal(mode, projectId) {
     el.projectNameInput.value = ''; el.projectDescInput.value = '';
     el.projectFormSection.hidden = false;
     setTimeout(() => el.projectNameInput.focus(), 50);
-
   } else if (mode === 'edit') {
     el.projectModalTitle.textContent = 'Editar Projeto';
     try {
@@ -1112,7 +1690,6 @@ async function openProjectModal(mode, projectId) {
       el.projectFormSection.hidden = false;
       setTimeout(() => el.projectNameInput.focus(), 50);
     } catch { el.projectFormSection.hidden = false; }
-
   } else if (mode === 'detail') {
     try {
       const res = await fetch(`${API.BASE}/api/projects/${projectId}`);
@@ -1157,15 +1734,13 @@ async function saveProject() {
   }
 }
 
-/* ── Chats do projeto ─── */
 async function loadProjectChats(projectId) {
   if (!el.projectChatsList) return;
   el.projectChatsList.innerHTML = '<div class="spinner"></div>';
   try {
     const res = await fetch(`${API.BASE}/api/history/project/${projectId}`);
     if (!res.ok) throw new Error();
-    const chats = await res.json();
-    renderProjectChats(chats);
+    renderProjectChats(await res.json());
   } catch {
     el.projectChatsList.innerHTML = '<p class="project-chats-empty">Erro ao carregar chats.</p>';
   }
@@ -1193,15 +1768,11 @@ function renderProjectChats(chats) {
         <polyline points="9 18 15 12 9 6"/>
       </svg>
     `;
-    item.addEventListener('click', () => {
-      closeProjectModal();
-      loadConversation(conv.id);
-    });
+    item.addEventListener('click', () => { closeProjectModal(); loadConversation(conv.id); });
     el.projectChatsList.appendChild(item);
   });
 }
 
-/* ── Arquivos do projeto ─── */
 function renderProjectFiles(files) {
   el.projectFilesList.innerHTML = '';
   if (!files.length) {
@@ -1211,9 +1782,9 @@ function renderProjectFiles(files) {
   files.forEach(f => {
     const item = document.createElement('div');
     item.className = 'project-file-item';
-    const icon = f.fileType === 'pdf' ? '📄' : f.fileType === 'docx' ? '📝' : f.fileType === 'text' ? '✏️' : '📃';
+    const icon   = f.fileType === 'pdf' ? '📄' : f.fileType === 'docx' ? '📝' : f.fileType === 'text' ? '✏️' : '📃';
     const sizeKb = f.contentLength ? Math.round(f.contentLength / 1024) : 0;
-    const size = sizeKb > 0 ? sizeKb + ' KB' : '';
+    const size   = sizeKb > 0 ? sizeKb + ' KB' : '';
     item.innerHTML = `
       <span class="project-file-icon">${icon}</span>
       <span class="project-file-name" title="${escapeHtml(f.filename)}">${escapeHtml(f.filename)}</span>
@@ -1229,9 +1800,8 @@ async function handleProjectFileUpload(e) {
   if (!files.length || !currentProjectId) return;
   for (const file of files) {
     const formData = new FormData(); formData.append('file', file);
-    try {
-      await fetch(`${API.BASE}/api/projects/${currentProjectId}/files`, { method: 'POST', body: formData });
-    } catch (err) { console.error('Erro ao enviar arquivo:', err); }
+    try { await fetch(`${API.BASE}/api/projects/${currentProjectId}/files`, { method: 'POST', body: formData }); }
+    catch (err) { console.error('Erro ao enviar arquivo:', err); }
   }
   e.target.value = '';
   const res = await fetch(`${API.BASE}/api/projects/${currentProjectId}`);

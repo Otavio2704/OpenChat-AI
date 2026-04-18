@@ -6,75 +6,62 @@
   <title>Kyron AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" id="hljs-theme" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,5 93,27.5 93,72.5 50,95 7,72.5 7,27.5' fill='%2300e5a0'/%3E%3Ctext x='50' y='67' font-size='48' text-anchor='middle' fill='%23000' font-family='system-ui' font-weight='bold'%3EK%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,5 93,27.5 93,72.5 50,95 7,72.5 7,27.5' fill='%2310a37f'/%3E%3Ctext x='50' y='67' font-size='48' text-anchor='middle' fill='%23FFFFFF' font-family='system-ui' font-weight='bold'%3E💬%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-
     <div class="sidebar-header">
       <div class="logo">
-        <div class="logo-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" fill="var(--accent)" opacity="0.15" stroke="var(--accent)" stroke-width="1.5"/>
-            <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="var(--accent)" font-family="Inter,sans-serif">K</text>
-          </svg>
-        </div>
-        <span class="logo-text">Kyron <span class="logo-ai">AI</span></span>
+        <span class="logo-hex">⬡</span>
+        <span class="logo-text">Kyron AI</span>
       </div>
       <button class="btn-new-chat" id="btn-new-chat" title="Nova conversa">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
       </button>
     </div>
 
     <div class="sidebar-search">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <input type="text" id="search-input" placeholder="Buscar conversas..." autocomplete="off" />
     </div>
 
-    <div class="sidebar-body">
-
-      <div class="sidebar-section-label sidebar-section-toggle" id="recents-section-label">
-        <span>Recentes</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <nav class="history-list" id="history-list">
-        <div class="history-empty" id="history-empty"><span>Nenhuma conversa ainda.</span></div>
-      </nav>
-
-      <div class="sidebar-section-label sidebar-section-toggle" id="projects-section-label">
-        <span>Projetos</span>
-        <button class="btn-section-add" id="btn-new-project" title="Novo projeto">+</button>
-      </div>
-      <nav class="history-list" id="projects-list">
-        <div class="history-empty" id="projects-empty"><span>Nenhum projeto ainda.</span></div>
-      </nav>
-
+    <div class="sidebar-section-label sidebar-section-toggle" id="recents-section-label">
+      <span>Recentes</span>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
+    <nav class="history-list" id="history-list">
+      <div class="history-empty" id="history-empty"><span>Nenhuma conversa ainda.</span></div>
+    </nav>
+
+    <div class="sidebar-section-label sidebar-section-toggle" id="projects-section-label">
+      <span>Projetos</span>
+      <button class="btn-section-add" id="btn-new-project" title="Novo projeto">+</button>
+    </div>
+    <nav class="history-list" id="projects-list">
+      <div class="history-empty" id="projects-empty"><span>Nenhum projeto ainda.</span></div>
+    </nav>
 
     <div class="sidebar-footer">
       <div class="sidebar-footer-info" id="ollama-status">
         <span class="status-dot" id="status-dot"></span>
         <span id="status-text">Conectando...</span>
       </div>
-      <div class="sidebar-footer-version">v2.0</div>
     </div>
-
   </aside>
 
-  <!-- Collapse toggle -->
   <button class="btn-sidebar-collapse" id="btn-sidebar-collapse" title="Recolher sidebar">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="collapse-icon">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="collapse-icon">
       <polyline points="15 18 9 12 15 6"/>
     </svg>
   </button>
@@ -82,55 +69,44 @@
   <!-- MAIN -->
   <main class="main" id="main">
 
-    <!-- TOPBAR -->
     <header class="topbar">
       <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" title="Menu">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="6" x2="21" y2="6"/>
           <line x1="3" y1="12" x2="21" y2="12"/>
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
 
-      <div class="topbar-center">
-        <div class="model-selector-wrap">
-          <div class="model-selector">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-            </svg>
-            <select id="model-select"><option value="">Carregando...</option></select>
-            <svg class="model-selector-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </div>
-          <div class="model-tags" id="model-tags"></div>
+      <div class="model-selector-wrap">
+        <div class="model-selector">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+          </svg>
+          <select id="model-select"><option value="">Carregando...</option></select>
         </div>
+        <div class="model-tags" id="model-tags"></div>
       </div>
 
       <div class="topbar-actions">
-        <button class="btn-icon" id="btn-memory" title="Memória">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="btn-icon" id="btn-memory" title="Memória do usuário">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <ellipse cx="12" cy="5" rx="9" ry="3"/>
             <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
           </svg>
         </button>
         <button class="btn-icon" id="btn-theme" title="Alternar tema">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
         </button>
         <button class="btn-icon" id="btn-settings" title="Configurações">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
@@ -138,240 +114,267 @@
       </div>
     </header>
 
-    <!-- Settings Panel -->
+    <!-- Painel de configurações (igual ao anterior) -->
     <div class="settings-panel" id="settings-panel" hidden>
       <div class="settings-panel-inner">
-
-        <div class="settings-section">
-          <div class="settings-title">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
-            Parâmetros do Modelo
+        <div class="settings-title">Configurações do Modelo</div>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label for="param-temperature">Temperature <span class="settings-value" id="temperature-value">0.7</span></label>
+            <input type="range" id="param-temperature" min="0" max="1" step="0.05" value="0.7" />
+            <span class="settings-hint">Criatividade da resposta</span>
           </div>
-          <div class="settings-grid">
-
-            <div class="settings-field">
-              <label for="param-temperature">
-                Temperature
-                <span class="settings-value" id="temperature-value">0.7</span>
-              </label>
-              <input type="range" id="param-temperature" min="0" max="1" step="0.05" value="0.7" />
-              <span class="settings-hint">Criatividade da resposta</span>
-            </div>
-
-            <div class="settings-field" id="ctx-slider-field">
-              <label for="param-ctx">
-                Context Length
-                <span class="settings-value" id="ctx-value">2048</span>
-              </label>
-              <input type="range" id="param-ctx" min="512" max="32768" step="512" value="2048" />
-              <span class="settings-hint">Tokens de contexto</span>
-            </div>
-
-            <div class="settings-field full-width">
-              <label for="param-system">System Prompt</label>
-              <textarea id="param-system" rows="3" placeholder="Você é um assistente útil e preciso..."></textarea>
-            </div>
-
-            <div class="settings-field">
-              <label for="param-language">Idioma</label>
-              <select id="param-language" class="settings-select">
-                <option value="">Padrão do modelo</option>
-                <option value="Português Brasileiro">Português Brasileiro</option>
-                <option value="Inglês">English</option>
-                <option value="Espanhol">Español</option>
-                <option value="Francês">Français</option>
-                <option value="Alemão">Deutsch</option>
-                <option value="Italiano">Italiano</option>
-                <option value="Japonês">日本語</option>
-                <option value="Chinês">中文</option>
-              </select>
-              <span class="settings-hint">Força o idioma das respostas</span>
-            </div>
-
-            <div class="settings-field disabled" id="thinking-field">
-              <label class="toggle-label">
-                <input type="checkbox" id="param-thinking" disabled />
-                <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                Thinking Mode
-              </label>
-              <span class="settings-hint">Requer modelo com suporte a raciocínio</span>
-            </div>
-
+          <div class="settings-field" id="ctx-slider-field">
+            <label for="param-ctx">Context Length <span class="settings-value" id="ctx-value">2048</span></label>
+            <input type="range" id="param-ctx" min="512" max="32768" step="512" value="2048" />
+            <span class="settings-hint">Tokens de contexto</span>
+          </div>
+          <div class="settings-field full-width">
+            <label for="param-system">System Prompt</label>
+            <textarea id="param-system" rows="3" placeholder="Você é um assistente útil e preciso..."></textarea>
+          </div>
+          <div class="settings-field">
+            <label for="param-language">Idioma das Respostas</label>
+            <select id="param-language" class="settings-select">
+              <option value="">Padrão do modelo</option>
+              <option value="Português Brasileiro">Português Brasileiro</option>
+              <option value="Inglês">Inglês (English)</option>
+              <option value="Espanhol">Espanhol (Español)</option>
+              <option value="Francês">Francês (Français)</option>
+              <option value="Alemão">Alemão (Deutsch)</option>
+              <option value="Italiano">Italiano</option>
+              <option value="Japonês">Japonês (日本語)</option>
+              <option value="Chinês">Chinês (中文)</option>
+            </select>
+            <span class="settings-hint">Força o modelo a responder neste idioma</span>
+          </div>
+          <div class="settings-field disabled" id="thinking-field" title="Carregando...">
+            <label class="toggle-label">
+              <input type="checkbox" id="param-thinking" disabled />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              Thinking Mode
+            </label>
+            <span class="settings-hint">Apenas para modelos com suporte a raciocínio</span>
           </div>
         </div>
-
         <div class="settings-divider"></div>
-
-        <div class="settings-section">
-          <div class="settings-title">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-            Aparência
-          </div>
-          <div class="settings-grid">
-            <div class="settings-field">
-              <label>Cor de Ênfase</label>
-              <div class="accent-swatches" id="accent-swatches">
-                <button class="swatch active" data-color="#00e5a0" style="background:#00e5a0" title="Verde Kyron"></button>
-                <button class="swatch" data-color="#7c6aff" style="background:#7c6aff" title="Roxo"></button>
-                <button class="swatch" data-color="#ff6b6b" style="background:#ff6b6b" title="Coral"></button>
-                <button class="swatch" data-color="#ffa94d" style="background:#ffa94d" title="Âmbar"></button>
-                <button class="swatch" data-color="#4dabf7" style="background:#4dabf7" title="Azul"></button>
-                <button class="swatch" data-color="#f06fca" style="background:#f06fca" title="Rosa"></button>
-                <button class="swatch swatch-custom" id="swatch-custom" title="Personalizado">
-                  <input type="color" id="custom-color-input" value="#00e5a0" />
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
-              </div>
-              <span class="settings-hint">Cor de destaque da interface</span>
+        <div class="settings-title">Aparência</div>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label>Cor de Ênfase</label>
+            <div class="accent-swatches" id="accent-swatches">
+              <button class="swatch active" data-color="#00e5a0" style="background:#00e5a0" title="Verde"></button>
+              <button class="swatch" data-color="#7c6aff" style="background:#7c6aff" title="Roxo"></button>
+              <button class="swatch" data-color="#ff6b6b" style="background:#ff6b6b" title="Vermelho"></button>
+              <button class="swatch" data-color="#ffa94d" style="background:#ffa94d" title="Laranja"></button>
+              <button class="swatch" data-color="#4dabf7" style="background:#4dabf7" title="Azul"></button>
+              <button class="swatch" data-color="#f06fca" style="background:#f06fca" title="Rosa"></button>
+              <button class="swatch swatch-custom" id="swatch-custom" title="Cor personalizada">
+                <input type="color" id="custom-color-input" value="#00e5a0" />
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
             </div>
+            <span class="settings-hint">Cor dos destaques da interface</span>
           </div>
         </div>
-
         <button class="btn-model-info" id="btn-model-info">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          Detalhes do modelo
+          Ver info do modelo
         </button>
-
       </div>
     </div>
 
-    <!-- Welcome Screen -->
+    <!-- Tela de boas-vindas -->
     <div class="welcome-screen" id="welcome-screen">
-      <div class="welcome-glow"></div>
-      <div class="welcome-content">
-        <div class="welcome-logo">
-          <svg width="52" height="52" viewBox="0 0 60 60" fill="none">
-            <polygon points="30,4 56,18 56,42 30,56 4,42 4,18" fill="var(--accent)" opacity="0.08" stroke="var(--accent)" stroke-width="1.5"/>
-            <polygon points="30,12 48,22 48,38 30,48 12,38 12,22" fill="var(--accent)" opacity="0.06" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 3"/>
-            <text x="30" y="37" text-anchor="middle" font-size="20" font-weight="700" fill="var(--accent)" font-family="Inter,sans-serif">K</text>
-          </svg>
-        </div>
-        <h1 class="welcome-title">Kyron <span class="welcome-title-ai">AI</span></h1>
-        <p class="welcome-subtitle">Inteligência local. Privacidade total.<br/>Seus dados nunca saem do seu hardware.</p>
-
-        <div class="welcome-chips-label">Sugestões para começar</div>
-        <div class="welcome-suggestions">
-          <button class="suggestion-chip" data-prompt="Explique o que é um design pattern em orientação a objetos">
-            <span class="chip-icon">🧩</span>
-            <span>Design Patterns</span>
-          </button>
-          <button class="suggestion-chip" data-prompt="Escreva um script Python para renomear arquivos em lote numa pasta">
-            <span class="chip-icon">🐍</span>
-            <span>Script Python</span>
-          </button>
-          <button class="suggestion-chip" data-prompt="Explique a diferença entre processo e thread de forma simples">
-            <span class="chip-icon">⚡</span>
-            <span>Processo vs Thread</span>
-          </button>
-          <button class="suggestion-chip" data-prompt="Como funciona o algoritmo de busca binária? Me dê um exemplo em Java">
-            <span class="chip-icon">🔍</span>
-            <span>Busca Binária</span>
-          </button>
-        </div>
+      <div class="welcome-hex">⬡</div>
+      <h1 class="welcome-title">Kyron AI</h1>
+      <p class="welcome-subtitle">Interface local para modelos open source.<br/>Seus dados ficam no seu hardware.</p>
+      <div class="welcome-suggestions">
+        <button class="suggestion-chip" data-prompt="Explique o que é um design pattern em orientação a objetos">Design Patterns</button>
+        <button class="suggestion-chip" data-prompt="Escreva um script Python para renomear arquivos em lote numa pasta">Script Python</button>
+        <button class="suggestion-chip" data-prompt="Explique a diferença entre processo e thread de forma simples">Processo vs Thread</button>
+        <button class="suggestion-chip" data-prompt="Como funciona o algoritmo de busca binária? Me dê um exemplo em Java">Busca Binária</button>
       </div>
     </div>
 
-    <!-- Messages -->
+    <!-- Área de mensagens -->
     <div class="messages-area" id="messages-area"></div>
 
-    <!-- Project badge -->
-    <div class="project-context-badge" id="project-context-badge" hidden>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-      </svg>
-      <span id="project-context-name">Projeto ativo</span>
-      <button class="btn-clear-project" id="btn-clear-project" title="Remover contexto">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    <!-- Painel de ações do agente (fixo acima do input) -->
+    <div class="agent-actions-panel" id="agent-actions-panel" hidden>
+      <div class="agent-actions-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-      </button>
+        Ações pendentes de aprovação
+      </div>
+      <div class="agent-actions-list" id="agent-actions-list"></div>
     </div>
 
-    <!-- Attach preview -->
+    <!-- Badge de projeto ativo -->
+    <div class="project-context-badge" id="project-context-badge" hidden>
+      <span>📁</span>
+      <span id="project-context-name">Projeto ativo</span>
+      <button class="btn-clear-project" id="btn-clear-project" title="Remover contexto do projeto">✕</button>
+    </div>
+
+    <!-- Badge do GitHub ativo -->
+    <div class="project-context-badge github-context-badge" id="github-context-badge" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      <span id="github-context-name">GitHub conectado</span>
+      <button class="btn-clear-project" id="btn-clear-github" title="Desconectar repositório">✕</button>
+    </div>
+
+    <!-- Preview de anexos -->
     <div class="attach-preview" id="attach-preview" hidden></div>
 
     <!-- Input -->
     <div class="input-area">
       <div class="input-wrapper">
-        <div class="input-tools">
-          <button class="btn-attach" id="btn-attach" title="Anexar arquivo" disabled>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-            </svg>
-          </button>
-          <button class="btn-web-search" id="btn-web-search" title="Busca web" aria-pressed="false">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </button>
-        </div>
+        <button class="btn-attach" id="btn-attach" title="Anexar arquivo" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+          </svg>
+        </button>
+
+        <!-- Web Search -->
+        <button class="btn-web-search" id="btn-web-search" title="Ativar busca web (RAG)" aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
+        <!-- Modo Código -->
+        <button class="btn-mode btn-code-mode" id="btn-code-mode" title="Ativar Modo Código" aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </button>
+
+        <!-- Modo Agente -->
+        <button class="btn-mode btn-agent-mode" id="btn-agent-mode" title="Ativar Modo Agente" aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </button>
+
+        <!-- GitHub -->
+        <button class="btn-mode btn-github" id="btn-github" title="Conectar repositório GitHub" aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </button>
 
         <input type="file" id="file-input" multiple hidden />
 
-        <textarea
-          id="message-input"
-          placeholder="Pergunte qualquer coisa..."
-          rows="1"
-          maxlength="32000"
-        ></textarea>
+        <textarea id="message-input" placeholder="Digite sua mensagem... (Enter para enviar, Shift+Enter para nova linha)" rows="1" maxlength="32000"></textarea>
 
         <button class="btn-send" id="btn-send" title="Enviar">
-          <svg id="icon-send" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg id="icon-send" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="22" y1="2" x2="11" y2="13"/>
             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
-          <svg id="icon-stop" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none">
-            <rect x="5" y="5" width="14" height="14" rx="2"/>
+          <svg id="icon-stop" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
           </svg>
         </button>
       </div>
-
       <div class="input-footer">
         <span class="char-count" id="char-count">0 / 32000</span>
-        <span class="input-hint">Os modelos podem cometer erros.</span>
+        <span class="input-hint">Os modelos podem cometer erros. Verifique informações importantes.</span>
       </div>
     </div>
 
   </main>
 
-  <!-- ══ MODAIS ══════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       PAINEL MODO CÓDIGO (slide-in da direita)
+  ══════════════════════════════════════════════════════ -->
+  <div class="code-panel" id="code-panel">
+    <div class="code-panel-header">
+      <div class="code-panel-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+        Arquivos Gerados
+      </div>
+      <div class="code-panel-actions">
+        <button class="btn-code-action" id="code-diff-toggle" title="Ver diff" style="display:none">Ver Diff</button>
+        <button class="btn-code-action" id="code-panel-download-file" title="Baixar arquivo atual">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Arquivo
+        </button>
+        <button class="btn-code-action btn-code-zip" id="code-panel-download-zip" title="Baixar tudo em ZIP">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          ZIP
+        </button>
+        <button class="btn-code-close" id="code-panel-close" title="Fechar">✕</button>
+      </div>
+    </div>
 
-  <!-- Model Info -->
+    <div class="code-panel-body">
+      <!-- Árvore de arquivos -->
+      <div class="code-file-tree" id="code-file-tree">
+        <div style="padding:16px;color:var(--text-2);font-size:12px;text-align:center">
+          Nenhum arquivo gerado ainda.
+        </div>
+      </div>
+
+      <!-- Editor / Visualizador -->
+      <div class="code-editor">
+        <div class="code-editor-topbar">
+          <span class="code-editor-filename" id="code-editor-filename">Selecione um arquivo</span>
+        </div>
+        <div class="code-editor-content" id="code-editor-content">
+          <div style="padding:24px;color:var(--text-2);font-size:12px">
+            Selecione um arquivo na árvore à esquerda para visualizar.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay para fechar o painel de código no mobile -->
+  <div class="code-panel-overlay" onclick="closeCodePanel()"></div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MODAIS EXISTENTES
+  ══════════════════════════════════════════════════════ -->
+
+  <!-- Modal info do modelo -->
   <div class="modal-backdrop" id="modal-backdrop" hidden>
     <div class="modal" id="model-info-modal">
       <div class="modal-header">
         <span class="modal-title" id="modal-title">Info do Modelo</span>
-        <button class="modal-close" id="modal-close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <button class="modal-close" id="modal-close">✕</button>
       </div>
       <div class="modal-body" id="modal-body"><div class="spinner"></div></div>
     </div>
   </div>
 
-  <!-- Memória -->
+  <!-- Modal de memória -->
   <div class="modal-backdrop" id="memory-backdrop" hidden>
     <div class="modal memory-modal" id="memory-modal">
       <div class="modal-header">
-        <span class="modal-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px">
-            <ellipse cx="12" cy="5" rx="9" ry="3"/>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-          </svg>
-          Memória do Usuário
-        </span>
-        <button class="modal-close" id="memory-modal-close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <span class="modal-title">🧠 Memória do Usuário</span>
+        <button class="modal-close" id="memory-modal-close">✕</button>
       </div>
       <div class="modal-body memory-body">
         <p class="memory-desc">Fatos injetados automaticamente em cada conversa para respostas mais personalizadas.</p>
@@ -384,76 +387,98 @@
             <option value="habilidade">Habilidade</option>
             <option value="projeto">Projeto</option>
           </select>
-          <button class="btn-memory-add" id="btn-memory-add">Adicionar</button>
+          <button class="btn-memory-add" id="btn-memory-add">+ Adicionar</button>
         </div>
         <div class="memory-list" id="memory-list"><div class="spinner"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- Projeto -->
+  <!-- Modal GitHub -->
+  <div class="modal-backdrop" id="github-backdrop" hidden>
+    <div class="modal github-modal">
+      <div class="modal-header">
+        <span class="modal-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          Repositórios GitHub
+        </span>
+        <button class="modal-close" id="github-modal-close">✕</button>
+      </div>
+      <div class="modal-body github-body">
+        <div class="github-connect-form">
+          <div class="github-form-row">
+            <input type="text" id="github-repo-input" class="rename-input" placeholder="owner/repositório (ex: Otavio2704/kyron-ai)" style="margin-bottom:0;flex:1" />
+            <input type="text" id="github-branch-input" class="rename-input" placeholder="branch (main)" style="margin-bottom:0;width:120px" />
+          </div>
+          <input type="password" id="github-token-input" class="rename-input" placeholder="Personal Access Token (opcional, para repos privados)" style="margin-bottom:0" />
+          <div class="github-form-footer">
+            <label class="toggle-label" style="gap:6px;font-size:12px">
+              <input type="checkbox" id="github-private-chk" />
+              <span class="toggle-track" style="width:28px;height:16px">
+                <span class="toggle-thumb" style="width:12px;height:12px"></span>
+              </span>
+              Repositório privado
+            </label>
+            <button class="btn-rename-confirm" id="btn-github-connect">Conectar</button>
+          </div>
+        </div>
+        <div class="github-repo-list" id="github-repo-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de projeto -->
   <div class="modal-backdrop" id="project-backdrop" hidden>
     <div class="modal project-modal" id="project-modal">
       <div class="modal-header">
         <span class="modal-title" id="project-modal-title">Novo Projeto</span>
-        <button class="modal-close" id="project-modal-close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <button class="modal-close" id="project-modal-close">✕</button>
       </div>
       <div class="modal-body project-body" id="project-modal-body">
-
         <div id="project-form-section">
           <div class="project-form">
             <label class="project-form-label">Nome do Projeto</label>
             <input type="text" id="project-name-input" class="rename-input" placeholder="Ex: API de Pagamentos" maxlength="100" />
-            <label class="project-form-label">Descrição <span style="opacity:.5;font-weight:400">(opcional)</span></label>
-            <textarea id="project-desc-input" class="settings-field-textarea" rows="3" placeholder="Descreva o contexto do projeto para a IA..."></textarea>
+            <label class="project-form-label">Descrição (opcional)</label>
+            <textarea id="project-desc-input" class="settings-field-textarea" rows="3" placeholder="Descreva o projeto para a IA entender o contexto..."></textarea>
           </div>
           <div class="rename-actions">
             <button class="btn-confirm-cancel" id="project-form-cancel">Cancelar</button>
-            <button class="btn-rename-confirm" id="project-form-save">Salvar Projeto</button>
+            <button class="btn-rename-confirm" id="project-form-save">Salvar</button>
           </div>
         </div>
-
         <div id="project-detail-section" hidden>
           <p class="project-detail-desc" id="project-detail-desc"></p>
-
           <div class="project-files-header">
             <span class="settings-title" style="margin:0">Arquivos de Contexto</span>
             <div class="project-add-actions">
-              <button class="btn-project-add-file" id="btn-project-add-file">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                Arquivo
-              </button>
-              <button class="btn-project-add-file" id="btn-project-add-text">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Texto
-              </button>
+              <button class="btn-project-add-file" id="btn-project-add-file">📎 Arquivo</button>
+              <button class="btn-project-add-file" id="btn-project-add-text">✏️ Texto</button>
             </div>
           </div>
           <input type="file" id="project-file-input" multiple hidden accept=".pdf,.docx,.txt,.md" />
           <div class="project-files-list" id="project-files-list"></div>
-
           <div class="project-text-add" id="project-text-add" hidden>
             <input type="text" id="project-text-name" class="rename-input" placeholder="Nome do contexto" style="margin-bottom:8px" />
-            <textarea id="project-text-content" rows="5" class="settings-field-textarea" placeholder="Cole o texto de contexto aqui..."></textarea>
+            <textarea id="project-text-content" rows="5" class="settings-field-textarea" placeholder="Cole aqui o texto de contexto..."></textarea>
             <div class="rename-actions" style="margin-top:8px">
               <button class="btn-confirm-cancel" id="project-text-cancel">Cancelar</button>
               <button class="btn-rename-confirm" id="project-text-save">Adicionar</button>
             </div>
           </div>
-
           <div class="project-chat-actions">
             <button class="btn-project-chat" id="btn-project-new-chat">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              Iniciar chat com este projeto
+              Iniciar novo chat com este projeto
             </button>
             <button class="btn-project-delete" id="btn-project-delete">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6l-1 14H6L5 6"/>
                 <path d="M10 11v6M14 11v6"/>
@@ -462,31 +487,23 @@
               Deletar projeto
             </button>
           </div>
-
           <div class="project-chats-section" id="project-chats-section">
             <div class="project-chats-header">
-              <span class="settings-title" style="margin:0">Chats vinculados</span>
+              <span class="settings-title" style="margin:0">Chats deste projeto</span>
             </div>
             <div class="project-chats-list" id="project-chats-list">
               <div class="spinner"></div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Confirmar delete -->
+  <!-- Modal de confirmação de delete -->
   <div class="modal-backdrop" id="confirm-backdrop" hidden>
     <div class="modal confirm-modal">
-      <div class="confirm-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-      </div>
+      <div class="confirm-icon">⚠</div>
       <div class="confirm-title">Tem certeza?</div>
       <div class="confirm-subtitle">Esta ação não pode ser desfeita.</div>
       <div class="confirm-actions">
@@ -496,16 +513,12 @@
     </div>
   </div>
 
-  <!-- Renomear -->
+  <!-- Modal de renomear conversa -->
   <div class="modal-backdrop" id="rename-backdrop" hidden>
     <div class="modal rename-modal">
       <div class="modal-header">
         <span class="modal-title">Renomear conversa</span>
-        <button class="modal-close" id="rename-close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <button class="modal-close" id="rename-close">✕</button>
       </div>
       <div class="modal-body">
         <input type="text" id="rename-input" class="rename-input" placeholder="Novo título..." maxlength="100" />

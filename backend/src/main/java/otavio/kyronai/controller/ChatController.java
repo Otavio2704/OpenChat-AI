@@ -27,9 +27,9 @@ public class ChatController {
     public SseEmitter chat(@RequestBody Map<String, Object> payload) {
         String convIdStr = (String) payload.get("conversationId");
         if (convIdStr == null || convIdStr.isBlank()) {
-            throw new IllegalArgumentException("conversationId é obrigatório para continuar uma conversa");
+            throw new IllegalArgumentException("conversationId é obrigatório");
         }
-        
+
         UUID   conversationId = UUID.fromString(convIdStr);
         String userMessage    = (String) payload.get("message");
         String model          = (String) payload.getOrDefault("model", "llama3.2");
@@ -40,24 +40,32 @@ public class ChatController {
 
         @SuppressWarnings("unchecked")
         List<String> images = (List<String>) payload.getOrDefault("images", List.of());
-        String projectIdStr = (String) payload.getOrDefault("projectId", null);
-        UUID projectId = projectIdStr != null ? UUID.fromString(projectIdStr) : null;
 
-        // Web search RAG — booleano enviado pelo frontend quando o usuário ativa a busca
+        String projectIdStr = (String) payload.getOrDefault("projectId", null);
+        UUID   projectId    = projectIdStr != null ? UUID.fromString(projectIdStr) : null;
+
         boolean webSearchEnabled = Boolean.TRUE.equals(payload.get("webSearch"));
+        boolean codeMode         = Boolean.TRUE.equals(payload.get("codeMode"));
+        boolean agentMode        = Boolean.TRUE.equals(payload.get("agentMode"));
+
+        String githubRepoIdStr = (String) payload.getOrDefault("githubRepoId", null);
+        UUID   githubRepoId    = githubRepoIdStr != null ? UUID.fromString(githubRepoIdStr) : null;
 
         SseEmitter emitter = new SseEmitter(180_000L);
         conversationService.addMessage(conversationId, "user", userMessage);
         List<Message> history = conversationService.getMessages(conversationId);
+
         ollamaService.streamChat(model, history, options, systemPrompt, images,
-                projectId, webSearchEnabled, emitter, conversationId);
+                projectId, webSearchEnabled, codeMode, agentMode, githubRepoId,
+                emitter, conversationId);
+
         return emitter;
     }
 
     @PostMapping(value = "/new", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter newChat(@RequestBody Map<String, Object> payload) {
-        String userMessage  = (String) payload.get("message");
-        String model        = (String) payload.getOrDefault("model", "llama3.2");
+        String userMessage = (String) payload.get("message");
+        String model       = (String) payload.getOrDefault("model", "llama3.2");
 
         @SuppressWarnings("unchecked")
         Map<String, Object> options = (Map<String, Object>) payload.getOrDefault("options", Map.of());
@@ -65,14 +73,20 @@ public class ChatController {
 
         @SuppressWarnings("unchecked")
         List<String> images = (List<String>) payload.getOrDefault("images", List.of());
+
         String projectIdStr = (String) payload.getOrDefault("projectId", null);
-        UUID projectId = projectIdStr != null ? UUID.fromString(projectIdStr) : null;
+        UUID   projectId    = projectIdStr != null ? UUID.fromString(projectIdStr) : null;
 
         boolean webSearchEnabled = Boolean.TRUE.equals(payload.get("webSearch"));
+        boolean codeMode         = Boolean.TRUE.equals(payload.get("codeMode"));
+        boolean agentMode        = Boolean.TRUE.equals(payload.get("agentMode"));
 
-        String title          = userMessage.length() > 50 ? userMessage.substring(0, 50) : userMessage;
+        String githubRepoIdStr = (String) payload.getOrDefault("githubRepoId", null);
+        UUID   githubRepoId    = githubRepoIdStr != null ? UUID.fromString(githubRepoIdStr) : null;
 
-        // Se há um projeto ativo, vincula a conversa a ele desde a criação
+        String title = userMessage != null && userMessage.length() > 50
+                ? userMessage.substring(0, 50) : userMessage;
+
         UUID conversationId = projectId != null
                 ? conversationService.createConversationForProject(title, model, projectId)
                 : conversationService.createConversation(title, model);
@@ -91,7 +105,8 @@ public class ChatController {
         }
 
         ollamaService.streamChat(model, history, options, systemPrompt, images,
-                projectId, webSearchEnabled, emitter, conversationId);
+                projectId, webSearchEnabled, codeMode, agentMode, githubRepoId,
+                emitter, conversationId);
 
         return emitter;
     }
