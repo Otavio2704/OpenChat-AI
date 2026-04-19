@@ -18,7 +18,7 @@ public interface GitHubRepositoryRepository extends JpaRepository<GitHubReposito
 
     List<GitHubRepository> findByOwnerOrderByCreatedAtDesc(String owner);
 
-    @Query("SELECT g FROM GitHubRepository g WHERE g.project.id = :projectId AND g.isPublic = true")
+    @Query("SELECT g FROM GithubRepo g WHERE g.project.id = :projectId AND g.isPublic = true")
     List<GitHubRepository> findPublicRepositoriesByProjectId(UUID projectId);
 
     boolean existsByOwnerAndRepositoryName(String owner, String repositoryName);

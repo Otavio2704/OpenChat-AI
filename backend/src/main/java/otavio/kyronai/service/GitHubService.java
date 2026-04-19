@@ -108,7 +108,7 @@ public class GitHubService {
 
         repo.setBranch(branch != null && !branch.isBlank() ? branch : "main");
         repo.setAccessToken(accessToken != null && !accessToken.isBlank() ? accessToken : null);
-        repo.setPrivate(isPrivate);
+        repo.setIsPrivate(isPrivate);
         repo.setIndexStatus(GitHubRepository.IndexStatus.PENDING);
 
         GitHubRepository saved = repoRepository.save(repo);
