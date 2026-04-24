@@ -6,7 +6,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 
-> **Kytrionyx AI** é uma interface web completa e local para interact com modelos de linguagem *open source* via **Ollama**. Um assistente de IA que roda inteiramente no seu hardware, sem enviar dados para servidores externos.
+> **Kytrionyx AI** é uma interface web completa e local para interagir com modelos de linguagem *open source* via **Ollama**. Um assistente de IA que roda inteiramente no seu hardware, sem enviar dados para servidores externos.
 
 ---
 
@@ -36,7 +36,7 @@
 - ✅ **Interface Web Moderna**: UI responsiva e intuitiva
 - ✅ **Persistência de Dados**: Histórico de conversas salvo em banco de dados
 - ✅ **Integração GitHub**: Analise código de repositórios GitHub
-- ✅ **Busca Web**: Integração com SearXNG para buscar informações online
+- ✅ **Busca Web**: Fallback inteligente SearXNG → DDG HTML → DDG Instant
 - ✅ **Análise de Arquivos**: Suporte para PDF, DOCX, TXT e Markdown
 - ✅ **Modo Código**: Sessões dedicadas para desenvolvimento com diffs visuais
 
@@ -72,7 +72,7 @@
 ### Busca Web
 - 🌐 Integração com SearXNG para busca web
 - 📄 Contexto web adicionado automaticamente às respostas
-- 🔒 Busca privada e descentralizada
+- 🔒 Busca privada e descentralizada com fallback automático
 
 ### Gerenciamento de Arquivos
 - 📤 Upload de arquivos para análise
@@ -94,7 +94,7 @@
 |-----------|--------|-----------|
 | **Java** | 17 | Linguagem de programação |
 | **Spring Boot** | 3.2.5 | Framework web |
-| **Spring WebFlux** | 3.2.5 | WebClient reativo e streaming |
+| **Spring WebFlux** | 3.2.5 | WebClient reativo e streaming SSE |
 | **Spring Data JPA** | 3.2.5 | ORM e repositórios |
 | **PostgreSQL** | 16 | Banco de dados relacional |
 | **Apache PDFBox** | 3.0.2 | Extração de texto de PDFs |
@@ -132,18 +132,19 @@
 ### Para Desenvolvimento Local
 - **Java**: 17+
 - **Maven**: 3.6+
-- **Node.js**: 14+ (opcional, para ferramentas do frontend)
 
 ### Configuração do Ollama
 - **Ollama**: Instalado e rodando na porta 11434
-- **Modelos baixados**: Use `ollama pull <modelo>` para baixar modelos disponíveis
+- **Modelos**: Use `ollama pull <modelo>` para baixar
 
 Modelos recomendados:
 ```bash
-ollama pull llama2           # Modelo base rápido
-ollama pull llama3.2         # Modelo melhorado
-ollama pull neural-chat      # Modelo otimizado para chat
-ollama pull mistral          # Modelo rápido e eficiente
+ollama pull llama3.2          # Uso geral, rápido e eficiente
+ollama pull qwen3             # Excelente raciocínio e código
+ollama pull gemma3            # Leve e preciso
+ollama pull deepseek-r1       # Thinking aprofundado
+ollama pull mistral           # Rápido e equilibrado
+ollama pull llava             # Suporte a visão (imagens)
 ```
 
 ---
@@ -207,54 +208,15 @@ http://localhost:8080
 
 ## 💻 Como Usar
 
-### Chat Básico
+Fluxo rápido para começar:
 
-1. **Nova Conversa**: Clique em "Nova Conversa" na barra lateral
-2. **Digite sua mensagem**: Use a caixa de entrada na parte inferior
-3. **Envie**: Pressione Enter ou clique no botão enviar
-4. Respostas aparecem em tempo real com streaming
+1. Abra `http://localhost:8080` e escolha um modelo disponível no Ollama.
+2. Para iniciar do zero, envie a primeira mensagem (usa `POST /api/chat/new`).
+3. Para continuar uma conversa, selecione no histórico e envie nova mensagem (usa `POST /api/chat`).
+4. Ative **Busca Web**, **Modo Código**, anexos ou contexto GitHub conforme necessário.
+5. Use **Projetos** e **Memória** para manter contexto persistente entre sessões.
 
-### Modo Código
-
-1. Clique no ícone de código {} na barra lateral
-2. Inicie uma **nova sessão de código**
-3. Peça para o IA gerar código
-4. Visualize diffs e propostas de código
-5. Aceite ou rejeite as mudanças
-
-### Integração GitHub
-
-**Conectar um Repositório:**
-1. Vá em **Projetos** → **Conectar GitHub**
-2. Digite `owner/repositorio` (ex: `torvalds/linux`)
-3. (Opcional) Forneça um token para repositórios privados
-4. Clique em "Conectar"
-5. Aguarde a indexação do repositório
-
-**Usar no Chat:**
-- Selecione o repositório conectado
-- Peça ao IA para analisar o código
-- O contexto será automaticamente incluído
-
-### Upload de Arquivos
-
-1. Clique no ícone de anexo 📎
-2. Selecione um arquivo (PDF, DOCX, TXT, MD)
-3. Máximo 20MB por arquivo
-4. O conteúdo será extraído e enviado ao modelo
-
-### Busca Web
-
-1. Ative "Busca Web" nas opções avançadas
-2. O IA buscará na internet e incluirá contexto web
-3. Respostas serão baseadas em informações atualizadas
-
-### Memória Contextual
-
-1. Clique em **Memória** 🧠 na barra lateral
-2. **Adicione** informações importantes
-3. Essas informações serão automaticamente incluídas em futuras conversas
-4. Útil para contexto persistente personalizado
+Isso já cobre o uso diário. Os recursos avançados (diffs, indexação GitHub, upload de contexto) entram naturalmente no mesmo fluxo de chat.
 
 ---
 
@@ -452,31 +414,32 @@ Ou use a interface web para adicionar tokens por repositório.
 ### Diagrama de Componentes
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Frontend (Navegador)                  │
-│           HTML5 + CSS3 + JavaScript Vanilla              │
-└────────────────────┬────────────────────────────────────┘
-                     │ HTTP REST + SSE
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│            Spring Boot 3.2.5 (Backend)                   │
-│  ┌─────────────┬──────────────┬─────────────────────┐   │
-│  │ Controllers │   Services   │   Repositories      │   │
-│  │ (REST API)  │  (Business)  │   (JPA)             │   │
-│  └─────────────┴──────────────┴─────────────────────┘   │
-└────────┬──────────────┬──────────────┬────────────────────┘
-         │              │              │
-         ▼              ▼              ▼
-    ┌─────────┐  ┌──────────┐  ┌────────────┐
-    │ Ollama  │  │GitHub API│  │PostgreSQL  │
-    │(Modelos)│  │(Análise) │  │(Histórico) │
-    └─────────┘  └──────────┘  └────────────┘
-         │
-         ▼
-    ┌─────────┐
-    │ SearXNG │
-    │(Busca)  │
-    └─────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                           Frontend (Browser)                           │
+│                    HTML + CSS + JavaScript + SSE                       │
+└──────────────────────────────┬─────────────────────────────────────────┘
+             │ HTTP REST + SSE
+             ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Spring Boot 3.2.5 Backend                       │
+│  Controllers (REST) | Services (regra de negócio) | Repositories (JPA)│
+│                                                                        │
+│  WebFlux/WebClient: streaming com Ollama + integrações externas        │
+└───────────────┬──────────────────────────────┬──────────────────────────┘
+       │                              │
+       ▼                              ▼
+      ┌─────────────┐                 ┌─────────────┐
+      │   Ollama    │                 │ PostgreSQL  │
+      │   /api/chat │                 │ Conversas   │
+      └─────────────┘                 └─────────────┘
+       │
+       ▼
+   ┌──────────────────────────────────────────────────────────┐
+   │ Busca Web com fallback em cadeia (WebFlux/WebClient)     │
+   │ 1) SearXNG (preferencial)                                │
+   │ 2) DuckDuckGo HTML                                       │
+   │ 3) DuckDuckGo Instant Answer API                         │
+   └──────────────────────────────────────────────────────────┘
 ```
 
 ### Fluxo de Chat
@@ -491,6 +454,23 @@ Usuario          Frontend         Backend          Ollama      DB
    │<─ Atualiza UI ──│                │              │          │
    │                 │                │─ Save msg ──────────────>│
    │                 │                │              │          │
+```
+
+### Fluxo de Busca Web (Fallback)
+
+```
+Usuário      Backend (OllamaService)          Provedores de busca
+  │                    │                                │
+  │─ webSearch=true ──>│                                │
+  │                    │─ tenta SearXNG ───────────────>│
+  │                    │<────────────── sucesso/falha ──│
+  │                    │─ se falhar: DDG HTML ─────────>│
+  │                    │<────────────── sucesso/falha ──│
+  │                    │─ se falhar: DDG Instant ──────>│
+  │                    │<────────────── sucesso/falha ──│
+  │                    │
+  │                    │─ injeta contexto encontrado no prompt
+  │<─ resposta SSE ────│
 ```
 
 ### Fluxo de Indexação GitHub
@@ -520,45 +500,77 @@ Usuario      Frontend      Backend       GitHub API      DB
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| **POST** | `/api/chat` | Enviar mensagem (SSE streaming) |
+| **POST** | `/api/chat/new` | Criar nova conversa + enviar primeira mensagem (SSE) |
+| **POST** | `/api/chat` | Enviar mensagem em conversa existente (SSE) |
+
+### Histórico
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
 | **GET** | `/api/history` | Listar conversas |
 | **GET** | `/api/history/{id}` | Obter conversa específica |
-| **POST** | `/api/history/create` | Criar nova conversa |
+| **GET** | `/api/history/project/{projectId}` | Listar conversas por projeto |
+| **PATCH** | `/api/history/{id}/pin` | Fixar/desafixar conversa |
+| **PATCH** | `/api/history/{id}/rename` | Renomear conversa |
 | **DELETE** | `/api/history/{id}` | Deletar conversa |
-| **POST** | `/api/history/{id}/rename` | Renomear conversa |
-| **POST** | `/api/history/{id}/pin` | Fixar/desafixar |
 
 ### Código
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| **POST** | `/api/code/generate` | Gerar código (SSE) |
-| **POST** | `/api/code/session` | Criar sessão de código |
-| **GET** | `/api/code/session/{id}` | Obter sessão |
+| **GET** | `/api/code/session/{conversationId}` | Obter sessão por conversa |
+| **GET** | `/api/code/session/{sessionId}/file/{fileId}` | Obter arquivo da sessão |
+| **GET** | `/api/code/session/{conversationId}/download/file/{fileId}` | Download de arquivo |
+| **GET** | `/api/code/session/{conversationId}/download/zip` | Download ZIP da sessão |
+| **DELETE** | `/api/code/session/{conversationId}` | Limpar sessão de código |
+| **GET** | `/api/code/system-prompt` | Obter prompt de modo código |
 
 ### GitHub
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| **GET** | `/api/github/repos` | Listar repositórios |
-| **POST** | `/api/github/connect` | Conectar repositório |
-| **DELETE** | `/api/github/repos/{id}` | Desconectar repositório |
-| **GET** | `/api/github/repos/{id}/index` | Status de indexação |
+| **GET** | `/api/github/repositories` | Listar repositórios conectados |
+| **POST** | `/api/github/repositories` | Conectar repositório |
+| **POST** | `/api/github/repositories/{id}/reindex` | Reindexar repositório |
+| **GET** | `/api/github/repositories/{id}/context` | Obter contexto indexado |
+| **DELETE** | `/api/github/repositories/{id}` | Remover repositório |
 
 ### Arquivos
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| **POST** | `/api/files/upload` | Upload e extração |
-| **GET** | `/api/files/{id}` | Obter arquivo |
+| **POST** | `/api/files/extract` | Extrair texto de arquivo (PDF, DOCX, TXT, MD) |
 
 ### Memória
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| **GET** | `/api/memory` | Listar itens de memória |
-| **POST** | `/api/memory` | Adicionar à memória |
-| **DELETE** | `/api/memory/{id}` | Deletar item |
+| **GET** | `/api/memories` | Listar memórias |
+| **POST** | `/api/memories` | Criar memória |
+| **PATCH** | `/api/memories/{id}/toggle` | Ativar/desativar memória |
+| **PUT** | `/api/memories/{id}` | Atualizar memória |
+| **DELETE** | `/api/memories/{id}` | Deletar memória |
+
+### Projetos
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| **GET** | `/api/projects` | Listar projetos |
+| **GET** | `/api/projects/{id}` | Obter projeto com arquivos |
+| **POST** | `/api/projects` | Criar projeto |
+| **PUT** | `/api/projects/{id}` | Atualizar projeto |
+| **DELETE** | `/api/projects/{id}` | Deletar projeto |
+| **POST** | `/api/projects/{id}/files` | Adicionar arquivo ao projeto |
+| **POST** | `/api/projects/{id}/texts` | Adicionar texto ao projeto |
+| **DELETE** | `/api/projects/files/{fileId}` | Remover arquivo do projeto |
+
+### Modelos
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| **GET** | `/api/models` | Listar modelos disponíveis no Ollama |
+| **GET** | `/api/models/{name}/info` | Obter detalhes de um modelo |
+| **GET** | `/api/models/{name}/capabilities` | Obter capacidades (thinking/vision/context) |
 
 ### Health Check
 
@@ -773,10 +785,11 @@ max-file-size: 50,000 caracteres
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ### Modelos Ollama Recomendados
-- **Rápidos**: `neural-chat`, `mistral`, `orca-mini`
-- **Balanced**: `llama3.2`, `neural-chat-7b`
-- **Poderosos**: `qwen2-72b`, `llama2-uncensored`
-- **Visão**: `llava`, `llama3.2-vision`
+- **Uso geral**: `llama3.2`
+- **Raciocínio e código**: `qwen3`
+- **Leve e eficiente**: `gemma3`
+- **Thinking avançado**: `deepseek-r1`
+- **Visão**: `llama3.2-vision` ou `llava`
 
 ---
 
@@ -814,4 +827,4 @@ Este projeto é licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](LIC
 
 **Desenvolvido com ❤️ por [Otavio2704](https://github.com/Otavio2704)**
 
-*Última atualização: 22 de abril de 2026*
+*Última atualização: 24 de abril de 2026*
