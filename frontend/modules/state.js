@@ -147,6 +147,8 @@ function initRefs() {
     codePanelTabs: $('code-panel-tabs'),
     codePanelPreview: $('code-panel-preview'),
     codePanelResizeHandle: $('code-panel-resize-handle'),
+    // i18n
+    interfaceLangSelect: $('param-ui-language'),
   };
 }
 
@@ -155,6 +157,8 @@ function initRefs() {
 ════════════════════════════════════════════════════════════════ */
 
 async function init() {
+  // i18n deve ser inicializado ANTES de qualquer referência DOM
+  initI18n();
   initRefs();
   await setupAllModules();
 }

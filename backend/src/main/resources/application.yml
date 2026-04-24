@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: kyron
+    name: kytrionyx-ai
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kyron}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kytrionyxai}
     username: ${SPRING_DATASOURCE_USERNAME:ollama}
     password: ${SPRING_DATASOURCE_PASSWORD:ollama123}
     driver-class-name: org.postgresql.Driver

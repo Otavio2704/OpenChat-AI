@@ -170,10 +170,6 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: -0.4px;
-  color: var(--text-0);
   white-space: nowrap;
 }
 
@@ -243,7 +239,7 @@ body {
   outline: none;
   color: var(--text-0);
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 14px;
   width: 100%;
 }
 
@@ -259,7 +255,7 @@ body {
 
 /* Section labels */
 .sidebar-section-label {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -285,7 +281,7 @@ body {
   border: 1px solid var(--border);
   background: var(--bg-2);
   color: var(--text-2);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -309,7 +305,7 @@ body {
 .history-empty {
   padding: 20px 12px;
   color: var(--text-2);
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   font-style: italic;
 }
@@ -353,7 +349,7 @@ body {
 .history-item-content { flex: 1; min-width: 0; }
 
 .history-item-title {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-0);
   white-space: nowrap;
@@ -364,7 +360,7 @@ body {
 .history-item.active .history-item-title { color: var(--accent); }
 
 .history-item-meta {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--text-2);
   margin-top: 2px;
   display: flex;
@@ -376,7 +372,7 @@ body {
   background: var(--bg-3);
   padding: 1px 5px;
   border-radius: 3px;
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: var(--text-1);
   white-space: nowrap;
   overflow: hidden;
@@ -425,7 +421,7 @@ body {
 
 /* Section separator */
 .history-section-sep {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -464,7 +460,7 @@ body {
 .project-item-content { flex: 1; overflow: hidden; }
 
 .project-item-name {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-0);
   white-space: nowrap;
@@ -475,7 +471,7 @@ body {
 .project-item.active .project-item-name { color: var(--accent); }
 
 .project-item-count {
-  font-size: 10px;
+  font-size: 11.5px;
   color: var(--text-2);
   margin-top: 1px;
 }
@@ -494,7 +490,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-2);
 }
 
@@ -1094,9 +1090,10 @@ input[type="range"] {
 }
 
 .message.assistant .message-avatar {
-  background: var(--accent-glow);
+  background: center / 78% no-repeat url('./kytrionyx-logo.png'), var(--accent-glow);
   border: 1px solid var(--border-accent);
-  color: var(--accent);
+  color: transparent;
+  font-size: 0;
 }
 
 .message-content { flex: 1; min-width: 0; }
@@ -4038,7 +4035,7 @@ body.code-panel-open .main {
 
   --text-0: #eef3fb;
   --text-1: #b7c0d2;
-  --text-2: #8590a6;
+  --text-2: #697083;
   --text-3: #566078;
 
   --accent: #2fd4a7;
@@ -4147,13 +4144,18 @@ textarea:focus-visible,
 }
 
 .logo-text {
-  letter-spacing: -0.03em;
-  font-weight: 700;
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .logo-hex {
-  color: var(--accent);
-  text-shadow: 0 0 22px var(--accent-glow);
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+  flex-shrink: 0;
 }
 
 .sidebar-search,
@@ -4371,11 +4373,18 @@ textarea:focus-visible,
 }
 
 .welcome-hex {
-  color: var(--accent);
-  font-size: clamp(18px, 2vw, 24px);
-  line-height: 1;
-  text-shadow: 0 0 18px var(--accent-glow);
+  width: clamp(42px, 5vw, 85px);
+  height: clamp(42px, 5vw, 100px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px var(--accent-glow));
   margin-bottom: 6px;
+}
+
+.welcome-title-image {
+  width: min(560px, 92vw);
+  max-height: 84px;
+  object-fit: contain;
+  display: block;
 }
 
 .welcome-subtitle {

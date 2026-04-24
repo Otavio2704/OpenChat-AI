@@ -72,13 +72,13 @@ function setupEventListeners() {
     state.webSearchEnabled = !state.webSearchEnabled;
     el.btnWebSearch.classList.toggle('active', state.webSearchEnabled);
     el.btnWebSearch.setAttribute('aria-pressed', state.webSearchEnabled);
-    el.btnWebSearch.title = state.webSearchEnabled ? 'Busca web ativa — clique para desativar' : 'Ativar busca web (RAG)';
+    el.btnWebSearch.title = state.webSearchEnabled ? t('input.webSearchActive') : t('input.webSearch');
   });
 
   el.btnCodeMode.addEventListener('click', () => {
     state.codeModeEnabled = !state.codeModeEnabled;
     el.btnCodeMode.classList.toggle('active', state.codeModeEnabled);
-    el.btnCodeMode.title = state.codeModeEnabled ? 'Modo Código ativo' : 'Ativar Modo Código';
+    el.btnCodeMode.title = state.codeModeEnabled ? t('input.codeModeActive') : t('input.codeMode');
     if (state.codeModeEnabled && state.conversationId) loadCodeSession();
   });
 
@@ -160,9 +160,16 @@ function setupEventListeners() {
   el.btnProjectNewChat.addEventListener('click', () => {
     if (typeof globalThis.startProjectChat === 'function') globalThis.startProjectChat();
   });
+
+  // ─── FIX: usa a referência globalThis que é garantida pelo projects.js ───
   el.btnProjectDelete.addEventListener('click', () => {
-    if (typeof globalThis.handleDeleteCurrentProject === 'function') globalThis.handleDeleteCurrentProject();
+    if (typeof globalThis.handleDeleteCurrentProject === 'function') {
+      globalThis.handleDeleteCurrentProject();
+    } else {
+      console.error('handleDeleteCurrentProject não encontrada no globalThis');
+    }
   });
+
   el.btnClearProject.addEventListener('click', clearProjectContext);
 
   el.searchInput.addEventListener('input', filterHistory);
@@ -181,5 +188,9 @@ async function setupAllModules() {
   configureMarked();
   loadPreferences();
   setupSectionToggles();
+  // Inicializa o seletor de idioma da interface e aplica textos traduzidos
+  setupInterfaceLanguageSelector();
+  applyStaticTranslations();
+  applyDynamicTranslations();
   await Promise.all([loadModels(), loadHistory(), loadProjects()]);
 }

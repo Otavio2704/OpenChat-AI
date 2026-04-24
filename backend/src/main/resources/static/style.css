@@ -170,10 +170,6 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: -0.4px;
-  color: var(--text-0);
   white-space: nowrap;
 }
 
@@ -243,7 +239,7 @@ body {
   outline: none;
   color: var(--text-0);
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 14px;
   width: 100%;
 }
 
@@ -259,7 +255,7 @@ body {
 
 /* Section labels */
 .sidebar-section-label {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -285,7 +281,7 @@ body {
   border: 1px solid var(--border);
   background: var(--bg-2);
   color: var(--text-2);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -309,7 +305,7 @@ body {
 .history-empty {
   padding: 20px 12px;
   color: var(--text-2);
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   font-style: italic;
 }
@@ -353,7 +349,7 @@ body {
 .history-item-content { flex: 1; min-width: 0; }
 
 .history-item-title {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-0);
   white-space: nowrap;
@@ -364,7 +360,7 @@ body {
 .history-item.active .history-item-title { color: var(--accent); }
 
 .history-item-meta {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--text-2);
   margin-top: 2px;
   display: flex;
@@ -376,7 +372,7 @@ body {
   background: var(--bg-3);
   padding: 1px 5px;
   border-radius: 3px;
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: var(--text-1);
   white-space: nowrap;
   overflow: hidden;
@@ -425,7 +421,7 @@ body {
 
 /* Section separator */
 .history-section-sep {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -464,7 +460,7 @@ body {
 .project-item-content { flex: 1; overflow: hidden; }
 
 .project-item-name {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-0);
   white-space: nowrap;
@@ -475,7 +471,7 @@ body {
 .project-item.active .project-item-name { color: var(--accent); }
 
 .project-item-count {
-  font-size: 10px;
+  font-size: 11.5px;
   color: var(--text-2);
   margin-top: 1px;
 }
@@ -494,7 +490,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-2);
 }
 
@@ -1094,9 +1090,10 @@ input[type="range"] {
 }
 
 .message.assistant .message-avatar {
-  background: var(--accent-glow);
+  background: center / 78% no-repeat url('./kytrionyx-logo.png'), var(--accent-glow);
   border: 1px solid var(--border-accent);
-  color: var(--accent);
+  color: transparent;
+  font-size: 0;
 }
 
 .message-content { flex: 1; min-width: 0; }
@@ -2616,165 +2613,8 @@ body.code-panel-open .main {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   MODO AGENTE — Cards de aprovação
+   GITHUB MODAL
 ════════════════════════════════════════════════════════════════ */
-
-.agent-actions-panel {
-  border-top: 1px solid var(--bg-3);
-  background: var(--bg-1);
-  padding: 10px 20px 12px;
-  max-height: 320px;
-  overflow-y: auto;
-  flex-shrink: 0;
-}
-
-.agent-actions-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--warning);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-
-.agent-actions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 820px;
-  margin: 0 auto;
-}
-
-.agent-action-card {
-  background: var(--bg-2);
-  border: 1px solid var(--bg-3);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
-  transition: all var(--transition);
-  animation: fade-in 0.2s ease-out;
-}
-
-.agent-action-card.processing { opacity: 0.6; pointer-events: none; }
-.agent-action-card.approved { border-color: var(--accent); background: var(--accent-dim); }
-.agent-action-card.rejected { border-color: var(--danger); opacity: 0.5; }
-
-.agent-action-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.agent-action-type {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.agent-action-type-create_file { background: rgba(16,163,127,0.15); color: var(--accent); }
-.agent-action-type-edit_file   { background: rgba(255,165,77,0.15);  color: var(--warning); }
-.agent-action-type-delete_file { background: rgba(255,107,107,0.15); color: var(--danger); }
-.agent-action-type-explain     { background: #155988; color: #ffffff; }
-.agent-action-type-run_command { background: #5a3aa8; color: #ffffff; }
-
-.agent-action-path {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-1);
-  background: var(--bg-3);
-  padding: 2px 6px;
-  border-radius: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 300px;
-}
-
-.agent-action-desc {
-  font-size: 12.5px;
-  color: var(--text-1);
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.agent-action-preview {
-  margin-bottom: 10px;
-  border: 1px solid var(--bg-3);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.agent-action-preview summary {
-  padding: 6px 10px;
-  font-size: 11px;
-  color: var(--text-2);
-  cursor: pointer;
-  background: var(--bg-3);
-  list-style: none;
-  user-select: none;
-}
-.agent-action-preview summary:hover { color: var(--text-0); }
-
-.agent-action-code {
-  margin: 0;
-  padding: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-1);
-  overflow-x: auto;
-  max-height: 160px;
-  overflow-y: auto;
-  background: var(--bg-1);
-}
-
-.agent-action-btns {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.btn-agent-approve, .btn-agent-reject {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 16px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition);
-  border: 1px solid;
-}
-
-.btn-agent-approve {
-  background: var(--accent-dim);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.btn-agent-approve:hover { background: var(--accent); color: var(--bg-0); }
-
-.btn-agent-reject {
-  background: rgba(255,107,107,0.08);
-  border-color: rgba(255,107,107,0.3);
-  color: var(--danger);
-}
-.btn-agent-reject:hover { background: var(--danger); color: #fff; }
-
-.agent-status-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-.agent-status-badge.approved { color: var(--accent); }
-.agent-status-badge.rejected { color: var(--danger); }
-
-/* ════════════════════════════════════════════════════════════════
    GITHUB MODAL
 ════════════════════════════════════════════════════════════════ */
 
@@ -3333,237 +3173,6 @@ body.code-panel-open .main {
   flex: 1;
   display: flex;
   overflow: hidden;
-}
-
-/* ════════════════════════════════════════════════════════════════
-   FILE SYSTEM AGENT — Barra de pasta local
-════════════════════════════════════════════════════════════════ */
-
-.agent-fs-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  background: var(--bg-2);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-  flex-shrink: 0;
-  animation: slide-down 0.2s var(--ease);
-}
-
-.agent-fs-bar[hidden] { display: none; }
-
-.agent-fs-icon {
-  color: var(--warning);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.agent-fs-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.agent-fs-path {
-  flex: 1;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-style: italic;
-}
-
-.agent-fs-path.connected {
-  color: var(--accent);
-  font-style: normal;
-}
-
-.agent-fs-path.connected::before {
-  content: '📁 ';
-}
-
-.btn-agent-fs-select {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-accent);
-  background: var(--accent-glow);
-  color: var(--accent);
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all var(--t-fast) var(--ease);
-}
-
-.btn-agent-fs-select:hover {
-  background: var(--accent);
-  color: var(--bg-0);
-}
-
-.btn-agent-fs-select:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.btn-agent-fs-clear {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-xs);
-  border: none;
-  background: none;
-  color: var(--text-2);
-  cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all var(--t-fast);
-}
-
-.btn-agent-fs-clear:hover {
-  color: var(--danger);
-  background: rgba(248,113,113,0.1);
-}
-
-.agent-fs-unsupported {
-  font-size: 11px;
-  color: var(--warning);
-  font-style: italic;
-}
-
-/* Indicador no botão agente quando pasta conectada */
-.btn-agent-mode.fs-connected {
-  position: relative;
-}
-
-.btn-agent-mode.fs-connected::after {
-  content: '';
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 5px var(--accent);
-}
-
-/* ── Aviso inline no card de ação ─── */
-.agent-action-fs-warn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11.5px;
-  color: var(--warning);
-  background: rgba(251,191,36,0.07);
-  border: 1px solid rgba(251,191,36,0.2);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  margin-bottom: 8px;
-}
-
-.agent-action-fs-warn svg { flex-shrink: 0; }
-
-/* ── Badge da pasta no header do card ─── */
-.agent-action-fs-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--accent);
-  background: var(--accent-glow);
-  border: 1px solid var(--border-accent);
-  padding: 2px 6px;
-  border-radius: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 160px;
-  flex-shrink: 0;
-}
-
-/* ── Resultado da escrita local ─── */
-.agent-action-fs-result {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 8px;
-  animation: fade-in 0.2s var(--ease);
-}
-
-.fs-result--saved {
-  color: var(--success);
-  background: rgba(52,211,153,0.08);
-  border: 1px solid rgba(52,211,153,0.2);
-}
-
-.fs-result--error {
-  color: var(--danger);
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.2);
-}
-
-.agent-action-fs-result svg { flex-shrink: 0; }
-.agent-action-fs-result strong { font-weight: 600; }
-
-/* ════════════════════════════════════════════════════════════════
-   FS TOAST — Notificação flutuante de operação de arquivo
-════════════════════════════════════════════════════════════════ */
-
-.fs-toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(12px);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: var(--shadow-lg);
-  z-index: 2000;
-  opacity: 0;
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
-  pointer-events: none;
-  max-width: 420px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.fs-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.fs-toast--success {
-  background: #0d2e24;
-  border: 1px solid rgba(52,211,153,0.3);
-  color: var(--success);
-}
-
-.fs-toast--error {
-  background: #2e0d0d;
-  border: 1px solid rgba(248,113,113,0.3);
-  color: var(--danger);
 }
 
 .fs-toast--info {
@@ -4426,7 +4035,7 @@ body.code-panel-open .main {
 
   --text-0: #eef3fb;
   --text-1: #b7c0d2;
-  --text-2: #8590a6;
+  --text-2: #697083;
   --text-3: #566078;
 
   --accent: #2fd4a7;
@@ -4535,13 +4144,18 @@ textarea:focus-visible,
 }
 
 .logo-text {
-  letter-spacing: -0.03em;
-  font-weight: 700;
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .logo-hex {
-  color: var(--accent);
-  text-shadow: 0 0 22px var(--accent-glow);
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+  flex-shrink: 0;
 }
 
 .sidebar-search,
@@ -4759,11 +4373,18 @@ textarea:focus-visible,
 }
 
 .welcome-hex {
-  color: var(--accent);
-  font-size: clamp(18px, 2vw, 24px);
-  line-height: 1;
-  text-shadow: 0 0 18px var(--accent-glow);
+  width: clamp(42px, 5vw, 85px);
+  height: clamp(42px, 5vw, 100px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px var(--accent-glow));
   margin-bottom: 6px;
+}
+
+.welcome-title-image {
+  width: min(560px, 92vw);
+  max-height: 84px;
+  object-fit: contain;
+  display: block;
 }
 
 .welcome-subtitle {

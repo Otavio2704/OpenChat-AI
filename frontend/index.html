@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,5 93,27.5 93,72.5 50,95 7,72.5 7,27.5' fill='%2310a37f'/%3E%3Ctext x='50' y='67' font-size='48' text-anchor='middle' fill='%23FFFFFF' font-family='system-ui' font-weight='bold'%3E💬%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/png" href="./kytrionyx-logo.png" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -23,10 +23,10 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
-        <span class="logo-hex">⬡</span>
-        <span class="logo-text">Kytrionyx AI</span>
+        <img class="logo-hex" src="./kytrionyx-logo.png" alt="Logo Kytrionyx AI" />
+        <img class="logo-text" src="./kytrionyx-letra.png" alt="Kytrionyx AI" />
       </div>
-      <button class="btn-new-chat" id="btn-new-chat" title="Nova conversa">
+      <button class="btn-new-chat" id="btn-new-chat" data-i18n-title="newChat">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
@@ -37,23 +37,23 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <input type="text" id="search-input" placeholder="Buscar conversas..." autocomplete="off" />
+      <input type="text" id="search-input" placeholder="Buscar conversas..." data-i18n="searchChats" autocomplete="off" />
     </div>
 
     <div class="sidebar-section-label sidebar-section-toggle" id="recents-section-label">
-      <span>Recentes</span>
+      <span data-i18n="recents">Recentes</span>
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
     <nav class="history-list" id="history-list">
-      <div class="history-empty" id="history-empty"><span>Nenhuma conversa ainda.</span></div>
+      <div class="history-empty" id="history-empty"><span data-i18n="noChats">Nenhuma conversa ainda.</span></div>
     </nav>
 
     <div class="sidebar-section-label sidebar-section-toggle" id="projects-section-label">
-      <span>Projetos</span>
-      <button class="btn-section-add" id="btn-new-project" title="Novo projeto">+</button>
+      <span data-i18n="projects">Projetos</span>
+      <button class="btn-section-add" id="btn-new-project" data-i18n-title="newProject">+</button>
     </div>
     <nav class="history-list" id="projects-list">
-      <div class="history-empty" id="projects-empty"><span>Nenhum projeto ainda.</span></div>
+      <div class="history-empty" id="projects-empty"><span data-i18n="noProjects">Nenhum projeto ainda.</span></div>
     </nav>
 
     <div class="sidebar-footer">
@@ -74,7 +74,7 @@
   <main class="main" id="main">
 
     <header class="topbar">
-      <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" title="Menu">
+      <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" data-i18n-title="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="6" x2="21" y2="6"/>
           <line x1="3" y1="12" x2="21" y2="12"/>
@@ -87,20 +87,20 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
           </svg>
-          <select id="model-select"><option value="">Carregando...</option></select>
+          <select id="model-select"><option value="" data-i18n="loadingModels">Carregando...</option></select>
         </div>
         <div class="model-tags" id="model-tags"></div>
       </div>
 
       <div class="topbar-actions">
-        <button class="btn-icon" id="btn-memory" title="Memória do usuário">
+        <button class="btn-icon" id="btn-memory" data-i18n-title="userMemory">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <ellipse cx="12" cy="5" rx="9" ry="3"/>
             <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
           </svg>
         </button>
-        <button class="btn-icon" id="btn-theme" title="Alternar tema">
+        <button class="btn-icon" id="btn-theme" data-i18n-title="toggleTheme">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
             <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
@@ -109,7 +109,7 @@
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
         </button>
-        <button class="btn-icon" id="btn-settings" title="Configurações">
+        <button class="btn-icon" id="btn-settings" data-i18n-title="settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -121,36 +121,45 @@
     <!-- Painel de configurações -->
     <div class="settings-panel" id="settings-panel" hidden>
       <div class="settings-panel-inner">
-        <div class="settings-title">Configurações do Modelo</div>
+        <div class="settings-title" data-i18n="settingsModelConfig">Configurações do Modelo</div>
         <div class="settings-grid">
           <div class="settings-field">
-            <label for="param-temperature">Temperature <span class="settings-value" id="temperature-value">0.7</span></label>
+            <label for="param-temperature" data-i18n="temperature">Temperature <span class="settings-value" id="temperature-value">0.7</span></label>
             <input type="range" id="param-temperature" min="0" max="1" step="0.05" value="0.7" />
-            <span class="settings-hint">Criatividade da resposta</span>
+            <span class="settings-hint" data-i18n="temperatureHint">Criatividade da resposta</span>
           </div>
           <div class="settings-field" id="ctx-slider-field">
-            <label for="param-ctx">Context Length <span class="settings-value" id="ctx-value">2048</span></label>
+            <label for="param-ctx" data-i18n="contextLength">Context Length <span class="settings-value" id="ctx-value">2048</span></label>
             <input type="range" id="param-ctx" min="512" max="32768" step="512" value="2048" />
-            <span class="settings-hint">Tokens de contexto</span>
+            <span class="settings-hint" data-i18n="contextLengthHint">Tokens de contexto</span>
           </div>
           <div class="settings-field full-width">
-            <label for="param-system">System Prompt</label>
-            <textarea id="param-system" rows="3" placeholder="Você é um assistente útil e preciso..."></textarea>
+            <label for="param-system" data-i18n="systemPrompt">System Prompt</label>
+            <textarea id="param-system" rows="3" placeholder="Você é um assistente útil e preciso..." data-i18n="systemPromptPlaceholder"></textarea>
           </div>
           <div class="settings-field">
-            <label for="param-language">Idioma das Respostas</label>
+            <label for="param-language" data-i18n="responseLanguage">Idioma das Respostas</label>
             <select id="param-language" class="settings-select">
-              <option value="">Padrão do modelo</option>
-              <option value="Português Brasileiro">Português Brasileiro</option>
-              <option value="Inglês">Inglês (English)</option>
-              <option value="Espanhol">Espanhol (Español)</option>
-              <option value="Francês">Francês (Français)</option>
-              <option value="Alemão">Alemão (Deutsch)</option>
-              <option value="Italiano">Italiano</option>
-              <option value="Japonês">Japonês (日本語)</option>
-              <option value="Chinês">Chinês (中文)</option>
+              <option value="" data-i18n="modelDefault">Padrão do modelo</option>
+              <option value="Portugués Brasileiro" data-i18n="portugueseBR">Portugués Brasileiro</option>
+              <option value="Inglês" data-i18n="english">Inglês (English)</option>
+              <option value="Espanhol" data-i18n="spanish">Espanhol (Español)</option>
+              <option value="Francês" data-i18n="french">Francês (Français)</option>
+              <option value="Alemão" data-i18n="german">Alemão (Deutsch)</option>
+              <option value="Italiano" data-i18n="italian">Italiano</option>
+              <option value="Japonês" data-i18n="japanese">Japonês (日本語)</option>
+              <option value="Chinês" data-i18n="chinese">Chinês (中文)</option>
             </select>
-            <span class="settings-hint">Força o modelo a responder neste idioma</span>
+            <span class="settings-hint" data-i18n="responseLanguageHint">Força o modelo a responder neste idioma</span>
+          </div>
+          <div class="settings-field">
+            <label for="param-ui-language">Idioma da Interface</label>
+            <select id="param-ui-language" class="settings-select">
+              <option value="pt">Português Brasileiro</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
+            <span class="settings-hint">Idioma dos botões, labels e menus</span>
           </div>
           <div class="settings-field disabled" id="thinking-field" title="Carregando...">
             <label class="toggle-label">
@@ -158,14 +167,14 @@
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
               Thinking Mode
             </label>
-            <span class="settings-hint">Apenas para modelos com suporte a raciocínio</span>
+            <span class="settings-hint" data-i18n="thinkingModeHint">Apenas para modelos com suporte a raciocínio</span>
           </div>
         </div>
         <div class="settings-divider"></div>
-        <div class="settings-title">Aparência</div>
+        <div class="settings-title" data-i18n="appearance">Aparência</div>
         <div class="settings-grid">
           <div class="settings-field">
-            <label>Cor de Ênfase</label>
+            <label data-i18n="accentColor">Cor de Ênfase</label>
             <div class="accent-swatches" id="accent-swatches">
               <button class="swatch active" data-color="#00e5a0" style="background:#00e5a0" title="Verde"></button>
               <button class="swatch" data-color="#7c6aff" style="background:#7c6aff" title="Roxo"></button>
@@ -178,10 +187,10 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
             </div>
-            <span class="settings-hint">Cor dos destaques da interface</span>
+            <span class="settings-hint" data-i18n="accentColorHint">Cor dos destaques da interface</span>
           </div>
         </div>
-        <button class="btn-model-info" id="btn-model-info">
+        <button class="btn-model-info" id="btn-model-info" data-i18n="modelInfo">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
@@ -192,9 +201,9 @@
 
     <!-- Tela de boas-vindas -->
     <div class="welcome-screen" id="welcome-screen">
-      <div class="welcome-hex">⬡</div>
-      <h1 class="welcome-title">Kytrionyx AI</h1>
-      <p class="welcome-subtitle">Interface local para modelos open source.<br/>Seus dados ficam no seu hardware.</p>
+      <img class="welcome-hex" src="./kytrionyx-logo.png" alt="Logo Kytrionyx AI" />
+      <h1 class="welcome-title" aria-label="Kytrionyx AI"><span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Kytrionyx AI</span><img class="welcome-title-image" src="./kytrionyx-letra.png" alt="" /></h1>
+      <p class="welcome-subtitle" data-i18n-html="welcomeSubtitle">Interface local para modelos open source.<br/>Seus dados ficam no seu hardware.</p>
       <div class="welcome-suggestions">
         <button class="suggestion-chip" data-prompt="Explique o que é um design pattern em orientação a objetos">Design Patterns</button>
         <button class="suggestion-chip" data-prompt="Escreva um script Python para renomear arquivos em lote numa pasta">Script Python</button>
@@ -228,14 +237,14 @@
     <!-- Input -->
     <div class="input-area">
       <div class="input-wrapper">
-        <button class="btn-attach" id="btn-attach" title="Anexar arquivo" disabled>
+        <button class="btn-attach" id="btn-attach" data-i18n-title="attachFile" disabled>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
           </svg>
         </button>
 
         <!-- Web Search -->
-        <button class="btn-web-search" id="btn-web-search" title="Ativar busca web (RAG)" aria-pressed="false">
+        <button class="btn-web-search" id="btn-web-search" data-i18n-title="webSearch" aria-pressed="false">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -243,7 +252,7 @@
         </button>
 
         <!-- Modo Código -->
-        <button class="btn-mode btn-code-mode" id="btn-code-mode" title="Ativar Modo Código" aria-pressed="false">
+        <button class="btn-mode btn-code-mode" id="btn-code-mode" data-i18n-title="codeMode" aria-pressed="false">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="16 18 22 12 16 6"/>
             <polyline points="8 6 2 12 8 18"/>
@@ -251,7 +260,7 @@
         </button>
 
         <!-- GitHub -->
-        <button class="btn-mode btn-github" id="btn-github" title="Conectar repositório GitHub" aria-pressed="false">
+        <button class="btn-mode btn-github" id="btn-github" data-i18n-title="githubRepo" aria-pressed="false">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
           </svg>
@@ -259,7 +268,7 @@
 
         <input type="file" id="file-input" multiple hidden />
 
-        <textarea id="message-input" placeholder="Digite sua mensagem... (Enter para enviar, Shift+Enter para nova linha)" rows="1" maxlength="32000"></textarea>
+        <textarea id="message-input" placeholder="Digite sua mensagem... (Enter para enviar, Shift+Enter para nova linha)" data-i18n="messageInputPlaceholder" rows="1" maxlength="32000"></textarea>
 
         <button class="btn-send" id="btn-send" title="Enviar">
           <svg id="icon-send" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -273,7 +282,7 @@
       </div>
       <div class="input-footer">
         <span class="char-count" id="char-count">0 / 32000</span>
-        <span class="input-hint">Os modelos podem cometer erros. Verifique informações importantes.</span>
+        <span class="input-hint" data-i18n="disclaimer">Os modelos podem cometer erros. Verifique informações importantes.</span>
       </div>
     </div>
 
@@ -534,6 +543,7 @@
   <!-- Core dependencies loaded first -->
   <script src="./modules/state.js"></script>
   <script src="./modules/utils.js"></script>
+  <script src="./modules/i18n.js"></script>
   
   <!-- UI preferences and setup -->
   <script src="./modules/preferences.js"></script>

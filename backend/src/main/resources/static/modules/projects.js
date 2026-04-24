@@ -1,5 +1,6 @@
 /* ════════════════════════════════════════════════════════════════
-   PROJETOS - Gerenciamento de projetos (TRUNCADO - ver frontend)
+   PROJETOS - Gerenciamento de projetos
+   Fix: handleDeleteCurrentProject agora exposta corretamente
 ════════════════════════════════════════════════════════════════ */
 
 async function loadProjects() {
@@ -28,7 +29,29 @@ function renderProjects(projects) {
         <div class="project-item-name" title="${escapeHtml(proj.name)}">${escapeHtml(proj.name)}</div>
         <div class="project-item-count">${proj.files ? proj.files.length + ' arquivo(s)' : 'Sem arquivos'}</div>
       </div>
+      <div class="history-item-actions">
+        <button class="btn-history-action rename" title="${t('history.rename')}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="btn-history-action delete" title="${t('history.delete')}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+          </svg>
+        </button>
+      </div>
     `;
+    item.querySelector('.rename').addEventListener('click', e => {
+      e.stopPropagation();
+      openProjectModal('edit', proj.id);
+    });
+    item.querySelector('.delete').addEventListener('click', e => {
+      e.stopPropagation();
+      deleteProject(proj.id, item);
+    });
     item.addEventListener('click', () => openProjectModal('detail', proj.id));
     el.projectsList.appendChild(item);
   });
@@ -47,6 +70,42 @@ async function deleteProject(id, itemEl) {
   });
 }
 
+// ─── FIX: função declarada como named function E exposta em globalThis ───────
+// O bug anterior ocorria porque event-listeners.js chamava globalThis.handleDeleteCurrentProject,
+// mas a função era declarada como async function dentro do módulo sem ser exposta.
+// Além disso, currentProjectId pode estar null se o modal for fechado/reaberto — agora
+// a função lê o valor diretamente do dataset do botão de detalhe como fallback.
+
+async function handleDeleteCurrentProject() {
+  // currentProjectId é a variável global declarada em state.js
+  if (!currentProjectId) {
+    console.warn('handleDeleteCurrentProject: currentProjectId está null');
+    return;
+  }
+
+  const idToDelete = currentProjectId;
+
+  openConfirm(async () => {
+    try {
+      const res = await fetch(`${API.BASE}/api/projects/${idToDelete}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // Limpa contexto se o projeto deletado estava ativo
+      if (state.activeProjectId === idToDelete) clearProjectContext();
+
+      // Fecha o modal antes de recarregar a lista
+      closeProjectModal();
+      await loadProjects();
+    } catch (err) {
+      console.error('Erro ao deletar projeto:', err);
+      alert(t('project.deleteError'));
+    }
+  });
+}
+
+// Expõe globalmente para que event-listeners.js consiga chamá-la
+globalThis.handleDeleteCurrentProject = handleDeleteCurrentProject;
+
 async function openProjectModal(mode, projectId) {
   currentProjectId = projectId || null;
   el.projectFormSection.hidden = true;
@@ -55,20 +114,35 @@ async function openProjectModal(mode, projectId) {
   el.projectBackdrop.hidden = false;
 
   if (mode === 'new') {
-    el.projectModalTitle.textContent = 'Novo Projeto';
+    el.projectModalTitle.textContent = t('project.new');
     el.projectNameInput.value = '';
     el.projectDescInput.value = '';
     el.projectFormSection.hidden = false;
+    setTimeout(() => el.projectNameInput.focus(), 50);
+  } else if (mode === 'edit') {
+    el.projectModalTitle.textContent = t('project.edit');
+    try {
+      const res = await fetch(`${API.BASE}/api/projects/${projectId}`);
+      const proj = await res.json();
+      el.projectNameInput.value = proj.name || '';
+      el.projectDescInput.value = proj.description || '';
+      el.projectFormSection.hidden = false;
+      setTimeout(() => el.projectNameInput.focus(), 50);
+    } catch {
+      el.projectFormSection.hidden = false;
+    }
   } else if (mode === 'detail') {
     try {
       const res = await fetch(`${API.BASE}/api/projects/${projectId}`);
       const proj = await res.json();
       el.projectModalTitle.textContent = proj.name;
-      el.projectDetailDesc.textContent = proj.description || 'Sem descrição.';
+      el.projectDetailDesc.textContent = proj.description || t('project.noDesc');
       el.projectDetailSection.hidden = false;
       renderProjectFiles(proj.files || []);
       await loadProjectChats(projectId);
-    } catch { }
+    } catch {
+      el.projectDetailSection.hidden = false;
+    }
   }
 }
 
@@ -77,6 +151,9 @@ function closeProjectModal() {
   currentProjectId = null;
   el.projectTextAdd.hidden = true;
 }
+
+// Expõe globalmente
+globalThis.closeProjectModal = closeProjectModal;
 
 async function saveProject() {
   const name = el.projectNameInput.value.trim();
@@ -104,8 +181,12 @@ async function saveProject() {
     await loadProjects();
   } catch (err) {
     console.error('Erro ao salvar projeto:', err);
+    alert(t('project.saveError'));
   }
 }
+
+// Expõe globalmente
+globalThis.saveProject = saveProject;
 
 async function loadProjectChats(projectId) {
   if (!el.projectChatsList) return;
@@ -115,14 +196,14 @@ async function loadProjectChats(projectId) {
     if (!res.ok) throw new Error();
     renderProjectChats(await res.json());
   } catch {
-    el.projectChatsList.innerHTML = '<p class="project-chats-empty">Erro ao carregar chats.</p>';
+    el.projectChatsList.innerHTML = `<p class="project-chats-empty">${t('project.chatsError')}</p>`;
   }
 }
 
 function renderProjectChats(chats) {
   el.projectChatsList.innerHTML = '';
   if (!chats.length) {
-    el.projectChatsList.innerHTML = '<p class="project-chats-empty">Nenhum chat com este projeto.</p>';
+    el.projectChatsList.innerHTML = `<p class="project-chats-empty">${t('project.noChats')}</p>`;
     return;
   }
   chats.forEach(conv => {
@@ -137,6 +218,9 @@ function renderProjectChats(chats) {
           <span class="project-chat-item-model">${escapeHtml(conv.modelName || '')}</span>
         </div>
       </div>
+      <svg class="project-chat-item-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
     `;
     item.addEventListener('click', () => {
       closeProjectModal();
@@ -149,17 +233,20 @@ function renderProjectChats(chats) {
 function renderProjectFiles(files) {
   el.projectFilesList.innerHTML = '';
   if (!files.length) {
-    el.projectFilesList.innerHTML = '<p style="font-size:12px;color:var(--text-2);text-align:center;padding:12px 0">Nenhum arquivo ainda.</p>';
+    el.projectFilesList.innerHTML = `<p style="font-size:12px;color:var(--text-2);text-align:center;padding:12px 0">${t('project.noFiles')}</p>`;
     return;
   }
   files.forEach(f => {
     const item = document.createElement('div');
     item.className = 'project-file-item';
-    const icon = f.fileType === 'pdf' ? '📄' : '📝';
+    const icon = f.fileType === 'pdf' ? '📄' : f.fileType === 'docx' ? '📝' : f.fileType === 'text' ? '✏️' : '📃';
+    const sizeKb = f.contentLength ? Math.round(f.contentLength / 1024) : 0;
+    const size = sizeKb > 0 ? sizeKb + ' KB' : '';
     item.innerHTML = `
       <span class="project-file-icon">${icon}</span>
       <span class="project-file-name" title="${escapeHtml(f.filename)}">${escapeHtml(f.filename)}</span>
-      <button class="btn-project-file-delete" onclick="deleteProjectFile('${f.id}', this)" title="Remover">✕</button>
+      <span class="project-file-size">${size}</span>
+      <button class="btn-project-file-delete" onclick="deleteProjectFile('${f.id}', this)" title="${t('history.delete')}">✕</button>
     `;
     el.projectFilesList.appendChild(item);
   });
@@ -194,6 +281,30 @@ globalThis.deleteProjectFile = async function (fileId, btn) {
   }
 };
 
+async function saveProjectText() {
+  const name = el.projectTextName.value.trim() || t('project.contextName');
+  const content = el.projectTextContent.value.trim();
+  if (!content || !currentProjectId) return;
+  try {
+    await fetch(`${API.BASE}/api/projects/${currentProjectId}/texts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, content }),
+    });
+    el.projectTextName.value = '';
+    el.projectTextContent.value = '';
+    el.projectTextAdd.hidden = true;
+    const res = await fetch(`${API.BASE}/api/projects/${currentProjectId}`);
+    const proj = await res.json();
+    renderProjectFiles(proj.files || []);
+    await loadProjects();
+  } catch (err) {
+    console.error('Erro ao salvar texto:', err);
+  }
+}
+
+globalThis.saveProjectText = saveProjectText;
+
 function startProjectChat() {
   if (!currentProjectId) return;
   const name = el.projectModalTitle.textContent;
@@ -203,11 +314,13 @@ function startProjectChat() {
   setTimeout(() => el.messageInput.focus(), 100);
 }
 
+globalThis.startProjectChat = startProjectChat;
+
 function setProjectContext(id, name) {
   state.activeProjectId = id;
   state.activeProjectName = name;
   el.projectContextBadge.hidden = false;
-  el.projectContextName.textContent = `Projeto: ${name}`;
+  el.projectContextName.textContent = `${t('project.active')}: ${name}`;
   document.querySelectorAll('.project-item').forEach(i => i.classList.toggle('active', i.dataset.id === id));
 }
 

@@ -60,6 +60,7 @@ function initRefs() {
     ctxValue:             $('ctx-value'),
     systemPrompt:         $('param-system'),
     languageSelect:       $('param-language'),
+    uiLanguageSelect:     $('param-ui-language'),
     thinkingChk:          $('param-thinking'),
     thinkingField:        $('thinking-field'),
     modalBackdrop:        $('modal-backdrop'),
@@ -151,10 +152,11 @@ function initRefs() {
 ════════════════════════════════════════════════════════════════ */
 async function init() {
   initRefs();
+  loadPreferences();
+  setInterfaceLanguage(currentLanguage);
   setupEventListeners();
   setupCodePanelResize();
   configureMarked();
-  loadPreferences();
   await Promise.all([loadModels(), loadHistory(), loadProjects()]);
   setupSectionToggles();
 }
@@ -190,6 +192,8 @@ function loadPreferences() {
   const lang = localStorage.getItem('oc-language') || '';
   if (el.languageSelect) el.languageSelect.value = lang;
   state.language = lang;
+  const uiLang = localStorage.getItem('oc-ui-language') || 'pt';
+  if (el.uiLanguageSelect) el.uiLanguageSelect.value = uiLang;
 }
 
 function applyTheme(theme) {

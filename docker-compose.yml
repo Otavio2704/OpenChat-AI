@@ -3,10 +3,10 @@ services:
   # ── PostgreSQL ───────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16
-    container_name: openchat-db
+    container_name: kytrionyx-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: openchat
+      POSTGRES_DB: kytrionyxai
       POSTGRES_USER: ollama
       POSTGRES_PASSWORD: ollama123
     ports:
@@ -14,27 +14,27 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ollama -d openchat"]
+      test: ["CMD-SHELL", "pg_isready -U ollama -d kytrionyxai"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
     networks:
-      - openchat-net
+      - kytrionyx-net
 
   # ── Backend Spring Boot ──────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: openchat-backend
+    container_name: kytrionyx-backend
     restart: unless-stopped
     ports:
       - "8080:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/openchat
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kytrionyxai
       SPRING_DATASOURCE_USERNAME: ollama
       SPRING_DATASOURCE_PASSWORD: ollama123
       OLLAMA_BASE_URL: http://host.docker.internal:11434
@@ -53,12 +53,12 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - openchat-net
+      - kytrionyx-net
 
   # ── SearXNG ──────────────────────────────────────────────────────────────────
   searxng:
     image: searxng/searxng:latest
-    container_name: openchat-searxng
+    container_name: kytrionyx-searxng
     restart: unless-stopped
     ports:
       - "8081:8080"          # 8081 no host para testar no browser
@@ -73,7 +73,7 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      - openchat-net
+      - kytrionyx-net
 
 # ── Volumes persistentes ─────────────────────────────────────────────────────
 volumes:
@@ -82,5 +82,5 @@ volumes:
 
 # ── Rede interna ─────────────────────────────────────────────────────────────
 networks:
-  openchat-net:
+  kytrionyx-net:
     driver: bridge
